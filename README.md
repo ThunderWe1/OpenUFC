@@ -87,6 +87,8 @@ npm run build:win
 
 产物为 `dist\OpenUFC-0.1.0-win-x64.exe`，只分发这一个文件即可：Electron、Python、依赖、图标与字体都已包含。图标可在 `assets/icon.svg` 修改，`npm run build:icon` 会重新生成 PNG、ICO 与启动卡片。
 
+只调试后端：`py main.py --server --port 0`。检查打包后的界面：`dist\OpenUFC-0.1.0-win-x64.exe --smoke`，自检使用独立的临时设置目录。
+
 ## 项目结构
 
 ```text
