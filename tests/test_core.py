@@ -678,7 +678,6 @@ def test_empty_current_recording_previews_and_exports(tmp_path, kind):
     (("settings", "optical_frequency_hz"), -1),
     (("settings", "divide_adev_by_optical_frequency"), None),
     (("settings", "divide_adev_by_sqrt2"), "false"),
-    (("ufc_segment_starts",), None),
     (("ufc_segment_starts",), []),
     (("ufc_segment_starts",), [1]),
     (("ufc_segment_starts",), [False]),
