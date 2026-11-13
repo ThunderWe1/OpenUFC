@@ -1,0 +1,21 @@
+{
+  "*IDN?": "Agilent Technologies,53230A,MY59220164,03.01-1909.4210-1.19-4.16-127-159-35",
+  "*OPT?": "0,106,0,0,400",
+  "CONF?": "\"FREQ +1.00000000000000E+008,+1.00000000000000E-002,(@3)\"",
+  "SENS:FREQ:MODE?": "CONT",
+  "SENS:FREQ:GATE:SOUR?": "TIME",
+  "SENS:FREQ:GATE:TIME?": "+1.00000000000000E-003",
+  "SAMP:COUN?": "+1000000",
+  "TRIG:SOUR?": "IMM",
+  "TRIG:COUN?": "+1",
+  "FORM:DATA?": "REAL,64",
+  "FORM:BORD?": "NORM",
+  "DISP?": "1",
+  "STAT:OPER:COND?": "+2048",
+  "DATA:POIN?": "+0",
+  "INP1:IMP?": "+1.00000000E+006",
+  "INP1:COUP?": "AC",
+  "INP1:LEV:AUTO?": "1",
+  "INP1:LEV?": "+0.00000000E+000",
+  "SYST:ERR?": "+0,\"No error\""
+}

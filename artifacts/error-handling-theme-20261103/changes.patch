@@ -1,0 +1,1403 @@
+--- before/electron/main.js
++++ electron/main.js
+@@ -4,11 +4,13 @@
+ const fs = require('node:fs');
+ 
+ let mainWindow = null;
++let startupWindow = null;
+ let backendProcess = null;
+ let backendUrl = null;
+ let quitting = false;
+ let allowWindowClose = false;
+ let resettingConfig = false;
++let stoppingBackend = false;
+ 
+ function pythonExecutable() {
+   if (process.env.OPENUFC_PYTHON) {
+@@ -51,6 +53,11 @@
+ 
+ function configFilePath() {
+   return path.join(dataDirectory(), 'config.json');
++}
++
++function setColorMode(mode) {
++  if (!['auto', 'light', 'dark'].includes(mode)) throw new Error('Invalid color mode');
++  nativeTheme.themeSource = mode === 'auto' ? 'system' : mode;
+ }
+ 
+ function scheduleRelaunch() {
+@@ -80,6 +87,7 @@
+ }
+ 
+ function startBackend() {
++  stoppingBackend = false;
+   return new Promise((resolve, reject) => {
+     const backend = backendCommand();
+     fs.mkdirSync(backend.cwd, { recursive: true });
+@@ -131,6 +139,8 @@
+       backendProcess = null;
+       if (!settled) {
+         fail(`Python backend exited before startup (code ${code}, signal ${signal})`);
++      } else if (!quitting && !resettingConfig && !stoppingBackend && mainWindow) {
++        mainWindow.webContents.send('backend:error', 'The measurement service stopped unexpectedly. Restart OpenUFC before acquiring more data.');
+       }
+     });
+ 
+@@ -139,6 +149,7 @@
+ }
+ 
+ async function stopBackend() {
++  stoppingBackend = true;
+   if (!backendProcess) {
+     backendUrl = null;
+     return;
+@@ -167,10 +178,29 @@
+   backendUrl = null;
+ }
+ 
++async function showStartupWindow() {
++  startupWindow = new BrowserWindow({
++    width: 480, height: 240, useContentSize: true, frame: false, resizable: false,
++    maximizable: false, fullscreenable: false, show: false, backgroundColor: '#232a33',
++    title: 'Starting OpenUFC', icon: path.join(app.getAppPath(), 'assets', 'icon.ico'),
++    webPreferences: { sandbox: true, contextIsolation: true, nodeIntegration: false }
++  });
++  startupWindow.on('closed', () => { startupWindow = null; });
++  await startupWindow.loadFile(path.join(app.getAppPath(), 'ui', 'startup.html'));
++  startupWindow.show();
++}
++
++function revealMainWindow() {
++  if (!mainWindow || mainWindow.isDestroyed()) return;
++  mainWindow.show();
++  if (startupWindow) startupWindow.destroy();
++}
++
+ function createWindow() {
+   mainWindow = new BrowserWindow({
+     width: 1440,
+     height: 980,
++    show: false,
+     minWidth: 1180,
+     minHeight: 820,
+     backgroundColor: '#00000000',
+@@ -188,6 +218,12 @@
+   });
+ 
+   mainWindow.loadFile(path.join(app.getAppPath(), 'ui', 'index.html'));
++  mainWindow.webContents.on('did-fail-load', (_event, code, description, _url, isMainFrame) => {
++    if (!isMainFrame) return;
++    if (startupWindow) startupWindow.destroy();
++    dialog.showErrorBox('Could not open OpenUFC', `${description} (${code})`);
++    app.quit();
++  });
+ 
+   for (const event of ['maximize', 'unmaximize']) {
+     mainWindow.on(event, () => {
+@@ -213,6 +249,8 @@
+         try {
+           mainWindow.setSize(1180, 820);
+           await mainWindow.webContents.executeJavaScript(`(${require('./smoke').toString()})()`);
++          await mainWindow.webContents.executeJavaScript(`(${require('./smoke').checkPreferences.toString()})()`);
++          if (nativeTheme.themeSource !== 'system') throw new Error('Auto appearance did not restore the system theme');
+           for (const theme of ['dark', 'light', 'dark']) {
+             nativeTheme.themeSource = theme;
+             await mainWindow.webContents.executeJavaScript(`(${require('./smoke').checkAppearance.toString()})('${theme}')`);
+@@ -233,6 +271,8 @@
+ 
+ ipcMain.handle('backend:get-url', () => backendUrl);
+ ipcMain.handle('app:get-version', () => app.getVersion());
++ipcMain.handle('app:set-color-mode', (_event, mode) => setColorMode(mode));
++ipcMain.handle('app:ready', revealMainWindow);
+ ipcMain.handle('window:is-maximized', () => mainWindow?.isMaximized() ?? false);
+ 
+ ipcMain.handle('window:minimize', () => {
+@@ -303,7 +343,14 @@
+ 
+ app.whenReady().then(async () => {
+   try {
++    await showStartupWindow();
+     await startBackend();
++    if (quitting) return;
++    if (startupWindow) await startupWindow.webContents.executeJavaScript("document.getElementById('startupStatus').textContent = 'Loading workspace…'");
++    if (!process.argv.includes('--smoke')) {
++      const config = JSON.parse(fs.readFileSync(configFilePath(), 'utf8'));
++      setColorMode(config.platform?.color_mode || 'auto');
++    }
+     createWindow();
+   } catch (error) {
+     if (process.argv.includes('--smoke')) {
+@@ -313,6 +360,7 @@
+       return;
+     }
+     dialog.showErrorBox('Laser Measurement Platform startup failed', String(error && error.message ? error.message : error));
++    if (startupWindow) startupWindow.destroy();
+     app.quit();
+   }
+ });
+--- before/electron/preload.js
++++ electron/preload.js
+@@ -2,6 +2,11 @@
+ 
+ contextBridge.exposeInMainWorld('openUfc', {
+   appVersion: () => ipcRenderer.invoke('app:get-version'),
++  ready: () => ipcRenderer.invoke('app:ready'),
++  setColorMode: (mode) => ipcRenderer.invoke('app:set-color-mode', mode),
++  onBackendError: (callback) => {
++    ipcRenderer.on('backend:error', (_event, message) => callback(message));
++  },
+   backendUrl: () => ipcRenderer.invoke('backend:get-url'),
+   minimizeWindow: () => ipcRenderer.invoke('window:minimize'),
+   toggleMaximizeWindow: () => ipcRenderer.invoke('window:toggle-maximize'),
+--- before/electron/smoke.js
++++ electron/smoke.js
+@@ -605,7 +605,7 @@
+           if (start && !fails) {
+             const expected = kind === 'wlm' ? 'first.local:23' : 'USB0::FIRST::INSTR';
+             if (calls.length !== 2 || calls[1].body.resource !== expected || first.running) throw new Error(label + ' lost its configuration or confirmed running before acquisition');
+-          } else if (calls.length !== 1 || first.running !== !start || first.statusText !== (fails ? 'request failed' : 'Stop requested')) {
++          } else if (calls.length !== 1 || first.running !== !start || (fails ? first.statusSeverity !== 'warning' || !errorQueue.some(item => item.key === first.id + '\nrequest failed') : first.statusText !== 'Stop requested')) {
+             throw new Error(label + ' did not update the original instrument');
+           }
+           if (second.running !== !start || second.statusText !== statusBefore || viewSnapshot() !== before) throw new Error(label + ' changed the newly selected instrument');
+@@ -757,7 +757,7 @@
+     if (!document.querySelector('#unidentifiedDevices').hidden || !document.querySelector('#disconnectedDevices').hidden) throw new Error('Empty device groups stayed visible');
+     api = async () => { throw new Error('Backend unavailable'); };
+     await loadDevices();
+-    if (!document.querySelector('#devicesEmpty').textContent.includes('failed') || !document.querySelector('#devicesStatus').textContent.includes('Backend unavailable')) throw new Error('Discovery failure was shown as an empty inventory');
++    if (!document.querySelector('#devicesEmpty').textContent.includes('failed') || !errorQueue.some((item) => item.message === 'Backend unavailable') || document.querySelector('#devicesStatus').dataset.severity !== 'warning') throw new Error('Discovery failure did not produce an error prompt and warning');
+     api = () => new Promise((resolve) => { resolveScan = resolve; });
+     const pending = loadDevices();
+     setView('home');
+@@ -835,3 +835,73 @@
+     if (label !== (maximized ? 'Restore window' : 'Maximize')) throw new Error('Incorrect maximize button label');
+   }
+ };
++
++module.exports.checkPreferences = async function checkPreferences() {
++  const wait = (ms = 30) => new Promise(resolve => setTimeout(resolve, ms));
++  const waitFor = async (check, message) => {
++    for (let i = 0; i < 100; i++) {
++      if (check()) return;
++      await wait();
++    }
++    throw new Error(message);
++  };
++  const errorDialog = $('errorDialog');
++  const dismissErrors = async () => {
++    while (errorDialog.open) { errorDialog.close(); await wait(); }
++  };
++  await dismissErrors();
++  for (const kind of ['ufc', 'dmm', 'wlm', 'opm']) {
++    const instance = state.instances[state.instruments.find(item => item.type === kind).id];
++    activateInstance(instance.id);
++    const status = $(kind === 'ufc' ? 'statusText' : `${kind}StatusText`);
++    for (const statusKind of ['warning', 'reconnecting']) {
++      handleInstrumentEvent({ instrument_id: instance.id, event: 'status', data: { text: 'Recovering from a temporary problem', kind: statusKind } });
++      if (status.dataset.severity !== 'warning' || errorDialog.open) throw new Error('Recoverable warning incorrectly presented: ' + statusKind);
++    }
++    const warningColor = getComputedStyle(status).color;
++    handleInstrumentEvent({ instrument_id: instance.id, event: 'status', data: { text: 'Ready', kind: 'connected', badge: 'READY' } });
++    if (status.dataset.severity !== 'info' || getComputedStyle(status).color === warningColor) throw new Error('Info and warning colors are not distinct');
++    const failure = { instrument_id: instance.id, event: 'error', data: { text: 'VI_ERROR_NCIC <img src=x>', details: 'Technical details\nVISA connection failed' } };
++    handleInstrumentEvent(failure);
++    handleInstrumentEvent(failure);
++    if (!errorDialog.open || errorQueue.length !== 1 || status.textContent.includes('VI_ERROR') || status.dataset.severity !== 'warning') throw new Error('Critical error was not isolated to a single prompt');
++    if ($('errorMessage').textContent !== failure.data.text || $('errorMessage').querySelector('img') || $('errorDetailsText').textContent !== failure.data.details) throw new Error('Error details were lost or interpreted as HTML');
++    if (!errorDialog.contains(document.activeElement)) throw new Error('Error dialog did not receive keyboard focus');
++    await dismissErrors();
++  }
++  showError('First operation', 'First failure');
++  showError('Second operation', 'Second failure');
++  errorDialog.close();
++  await wait();
++  if (!errorDialog.open || $('errorMessage').textContent !== 'Second failure') throw new Error('A concurrent error was lost');
++  await dismissErrors();
++
++  setView('home');
++  for (const mode of ['light', 'dark', 'auto']) {
++    openGlobalSettings();
++    document.querySelector(`[data-color-mode="${mode}"]`).click();
++    await waitFor(() => state.colorMode === mode, 'Appearance button did not select mode');
++    if (mode !== 'auto') await waitFor(() => matchMedia('(prefers-color-scheme: dark)').matches === (mode === 'dark'), 'Appearance preview did not apply');
++    await saveGlobalSettings();
++    await wait(220);
++    if ((await api('/api/config')).platform.color_mode !== mode) throw new Error('Appearance choice did not persist');
++  }
++  openGlobalSettings();
++  await previewColorMode('dark');
++  $('globalSettingsDialog').close();
++  await waitFor(() => state.colorMode === 'auto', 'Cancel did not restore saved appearance');
++  const realApi = api;
++  openGlobalSettings();
++  $('globalLibraryDir').value = 'unsaved-folder';
++  api = async () => { throw new Error('Disk is read-only'); };
++  try {
++    $('saveGlobalSettings').click();
++    await waitFor(() => errorDialog.open, 'Failed settings save did not show an error');
++    if (!$('globalSettingsDialog').open || $('globalLibraryDir').value !== 'unsaved-folder') throw new Error('Failed settings save discarded input');
++    await dismissErrors();
++  } finally {
++    api = realApi;
++    $('globalSettingsDialog').close();
++    await wait();
++  }
++};
+--- before/ui/renderer.js
++++ ui/renderer.js
+@@ -3,6 +3,7 @@
+   currentView: 'home',
+   config: null,
+   configSaveTimer: null,
++  colorMode: 'auto',
+   resetConfigInProgress: false,
+   addInstrumentMenuCloseTimer: null,
+   instruments: [],
+@@ -109,6 +110,7 @@
+     pendingAction: null,
+     badge: item.running ? 'BUSY' : 'OFFLINE',
+     statusText: item.running ? 'Acquisition running' : 'Offline',
++    statusSeverity: 'info',
+     launcherValue: '--'
+   };
+   if (item.type === 'ufc') {
+@@ -221,7 +223,7 @@
+   setBadge(['ufc', 'dmm', 'wlm', 'opm'].includes(view) ? activeInstance()?.badge || 'OFFLINE' : 'OFFLINE');
+   document.querySelector('.app-shell')?.scrollTo({ top: 0 });
+   syncTitleBarScrollState();
+-  if (view === 'library') loadLibrary().catch((error) => setLibraryStatus(error.message));
++  if (view === 'library') loadLibrary().catch((error) => reportLibraryError('Could not load Library', error));
+   if (view === 'devices') loadDevices();
+ }
+ 
+@@ -253,24 +255,13 @@
+ function refreshActiveInstanceOptions() {
+   const instance = activeInstance();
+   if (!instance) return;
+-  if (instance.type === 'ufc') {
+-    refreshResources().catch((error) => setInstrumentStatus(state.ufc, error.message, 'OFFLINE'));
+-  } else if (instance.type === 'dmm') {
+-    loadDmmOptions().then(refreshDmmResources).catch((error) => setInstrumentStatus(state.dmm, error.message, 'OFFLINE'));
+-  } else if (instance.type === 'wlm') {
+-    loadWlmOptions().catch((error) => {
+-      const text = error.message || String(error);
+-      if (state.activeInstanceId === instance.id && state.wlm === instance) {
+-        setInstrumentStatus(state.wlm, text, 'OFFLINE');
+-      } else {
+-        instance.statusText = text;
+-        instance.badge = 'OFFLINE';
+-        syncLauncherStatus();
+-      }
+-    });
+-  } else if (instance.type === 'opm') {
+-    loadOpmOptions().then(refreshOpmResources).catch((error) => setInstrumentStatus(state.opm, error.message, 'OFFLINE'));
+-  }
++  const actions = {
++    ufc: refreshResources,
++    dmm: () => loadDmmOptions().then(refreshDmmResources),
++    wlm: loadWlmOptions,
++    opm: () => loadOpmOptions().then(refreshOpmResources)
++  };
++  runInstrumentAction(instance, 'Could not load instrument resources', actions[instance.type]);
+ }
+ 
+ function openInstrumentInstance(instanceId) {
+@@ -467,12 +458,6 @@
+   return (instance?.display_name || '').trim() || meta.title || instance?.id || '';
+ }
+ 
+-function setRenameInstrumentError(message = '') {
+-  const error = $('renameInstrumentError');
+-  if (!error) return;
+-  error.textContent = message;
+-  error.classList.toggle('hidden', !message);
+-}
+ 
+ function setLauncherActionMode(instanceId = '', { focusRename = false, restoreFocus = false } = {}) {
+   const previousId = state.launcherActionInstanceId;
+@@ -500,7 +485,6 @@
+   input.value = (instance.display_name || '').trim();
+   input.placeholder = instrumentDisplayName(instance);
+   $('saveRenameInstrument').disabled = false;
+-  setRenameInstrumentError();
+   dialog.classList.remove('closing');
+   if (!dialog.open) dialog.showModal();
+   input.focus();
+@@ -518,7 +502,6 @@
+   if (!instance || state.renameInstrumentSaving) return;
+   state.renameInstrumentSaving = true;
+   $('saveRenameInstrument').disabled = true;
+-  setRenameInstrumentError();
+   const nextName = $('renameInstrumentName').value.trim();
+   try {
+     const updated = await api(`/api/instruments/${encodeURIComponent(instanceId)}/rename`, {
+@@ -530,7 +513,7 @@
+     renderLauncherCards();
+     closeModal($('renameInstrumentDialog'));
+   } catch (error) {
+-    setRenameInstrumentError(error.message || String(error));
++    showError('Could not rename instrument', error);
+   } finally {
+     state.renameInstrumentSaving = false;
+     $('saveRenameInstrument').disabled = false;
+@@ -611,18 +594,63 @@
+   });
+   button.querySelector('[data-delete-instance]')?.addEventListener('click', (event) => {
+     event.stopPropagation();
+-    deleteInstrumentInstance(instanceId).catch((error) => alert(error.message));
+-  });
+-}
+-
+-function setInstrumentStatus(instance, text, badge = null) {
++    deleteInstrumentInstance(instanceId).catch((error) => showError('Could not delete instrument', error));
++  });
++}
++
++const errorQueue = [];
++
++function showError(context, error, details = '', source = context) {
++  const message = error?.message || String(error || 'An unexpected error occurred.');
++  const key = `${source}\n${message}`;
++  if (errorQueue.some((item) => item.key === key)) return;
++  errorQueue.push({ context, message, details: details || error?.stack || '', key });
++  if (errorQueue.length === 1) showNextError();
++}
++
++function showNextError() {
++  if (!errorQueue.length) return;
++  const item = errorQueue[0];
++  $('errorContext').textContent = item.context;
++  $('errorMessage').textContent = item.message;
++  $('errorDetailsText').textContent = item.details;
++  $('errorDetails').hidden = !item.details;
++  $('errorDetails').open = false;
++  $('errorDialog').classList.remove('closing');
++  $('errorDialog').showModal();
++}
++
++function setStatusMessage(element, text, severity = 'info') {
++  element.textContent = text || '';
++  element.dataset.severity = severity;
++}
++
++function renderInstrumentStatus(instance) {
++  const id = instance.type === 'ufc' ? 'statusText' : `${instance.type}StatusText`;
++  setStatusMessage($(id), instance.statusText || 'Offline', instance.statusSeverity || 'info');
++}
++
++function reportInstrumentError(instance, context, error, details = '') {
++  setInstrumentStatus(instance, instance.running
++    ? 'Acquisition is still active. Review the error before continuing.'
++    : 'Action required. Review the error before retrying.', null, 'warning');
++  showError(`${instrumentDisplayName(instance)} — ${context}`, error, details, instance.id);
++}
++
++async function runInstrumentAction(instance, context, action) {
++  try {
++    return await action();
++  } catch (error) {
++    reportInstrumentError(instance, context, error);
++  }
++}
++
++function setInstrumentStatus(instance, text, badge = null, severity = 'info') {
+   instance.statusText = text;
++  instance.statusSeverity = severity;
+   if (badge) instance.badge = badge;
+   if (state.activeInstanceId === instance.id) {
+-    if (instance.type === 'ufc') $('statusText').textContent = text;
+-    else if (instance.type === 'dmm') $('dmmStatusText').textContent = text;
+-    else if (instance.type === 'wlm') $('wlmStatusText').textContent = text;
+-    else if (instance.type === 'opm') $('opmStatusText').textContent = text;
++    renderInstrumentStatus(instance);
+     if (state.currentView === instance.type) setBadge(instance.badge);
+   }
+   renderLauncherCards();
+@@ -630,7 +658,7 @@
+ 
+ function renderUfcInstance() {
+   const instance = state.ufc;
+-  $('statusText').textContent = instance.statusText || 'Offline';
++  renderInstrumentStatus(instance);
+   $('frequencyMetric').textContent = instance.frequencyMetric || '--';
+   $('frequencyUnit').textContent = instance.frequencyUnit || instance.frequencyDisplayUnit || 'MHz';
+   $('sampleRateMetric').textContent = instance.sampleRateMetric || '--';
+@@ -644,7 +672,7 @@
+ 
+ function renderDmmInstance() {
+   const instance = state.dmm;
+-  $('dmmStatusText').textContent = instance.statusText || 'Offline';
++  renderInstrumentStatus(instance);
+   $('dmmValueMetric').textContent = instance.valueMetric || '--';
+   $('dmmMinMetric').textContent = instance.minMetric || '--';
+   $('dmmMaxMetric').textContent = instance.maxMetric || '--';
+@@ -658,7 +686,7 @@
+ 
+ function renderWlmInstance() {
+   const instance = state.wlm;
+-  $('wlmStatusText').textContent = instance.statusText || 'Offline';
++  renderInstrumentStatus(instance);
+   $('wlmValueMetric').textContent = instance.valueMetric || '--';
+   $('wlmMinMetric').textContent = instance.minMetric || '--';
+   $('wlmMaxMetric').textContent = instance.maxMetric || '--';
+@@ -671,7 +699,7 @@
+ 
+ function renderOpmInstance() {
+   const instance = state.opm;
+-  $('opmStatusText').textContent = instance.statusText || 'Offline';
++  renderInstrumentStatus(instance);
+   $('opmValueMetric').textContent = instance.valueMetric || '--';
+   $('opmMinMetric').textContent = instance.minMetric || '--';
+   $('opmMaxMetric').textContent = instance.maxMetric || '--';
+@@ -734,7 +762,7 @@
+       instance.settings = updated.settings || settings;
+       state.instruments = state.instruments.map((item) => item.id === instance.id ? { ...item, settings: instance.settings } : item);
+     }).catch((error) => {
+-      setInstrumentStatus(instance, `Config save failed: ${error.message}`);
++      reportInstrumentError(instance, 'Could not save settings', error);
+     });
+   }, 350);
+ }
+@@ -799,6 +827,19 @@
+ 
+ function applyPlatformSettings(config) {
+   $('globalLibraryDir').value = config?.library_dir || configuredLibraryDir();
++  syncColorModeButtons(config?.color_mode || 'auto');
++}
++
++function syncColorModeButtons(mode) {
++  state.colorMode = mode;
++  document.querySelectorAll('[data-color-mode]').forEach((button) => {
++    button.setAttribute('aria-pressed', String(button.dataset.colorMode === mode));
++  });
++}
++
++async function previewColorMode(mode) {
++  await window.openUfc.setColorMode(mode);
++  syncColorModeButtons(mode);
+ }
+ 
+ function readUfcConfig() {
+@@ -879,7 +920,7 @@
+   }));
+   $('fnXScaleLabel').textContent = logX ? 'Log' : 'Linear';
+   $('fnYScaleLabel').textContent = logY ? 'Log' : 'Linear';
+-  $('fnStatus').textContent = state.ufc.fnStatus || '';
++  setStatusMessage($('fnStatus'), state.ufc.fnStatus || '', state.ufc.fnStatus ? 'warning' : 'info');
+   $('fnStatus').hidden = !state.ufc.fnStatus;
+   chart.update('none');
+ }
+@@ -939,7 +980,7 @@
+   // Capture this instrument's settings before navigation can change the form.
+   api(`/api/instruments/${encodeURIComponent(instance.id)}/settings`, {
+     method: 'POST', body: JSON.stringify(instance.settings)
+-  }).catch((error) => setInstrumentStatus(instance, `Config save failed: ${error.message}`));
++  }).catch((error) => reportInstrumentError(instance, 'Could not save settings', error));
+ }
+ 
+ function setDiscoveredInstrumentCount(elementId, count) {
+@@ -981,7 +1022,7 @@
+   });
+   if (!$('resource').value && resources.length) $('resource').value = resources[0];
+   setDiscoveredInstrumentCount('ufcResourceCount', payload.valid_count);
+-  setInstrumentStatus(instance, payload.error ? `VISA detection failed: ${payload.error}` : 'Offline', 'OFFLINE');
++  setInstrumentStatus(instance, payload.error ? `VISA discovery unavailable: ${payload.error}` : 'Offline', 'OFFLINE', payload.error ? 'warning' : 'info');
+ }
+ 
+ async function startAcquisition(instance = state.ufc) {
+@@ -1035,7 +1076,7 @@
+   } catch (error) {
+     if (instance.pendingAction !== action) return;
+     instance.pendingAction = null;
+-    setInstrumentStatus(instance, error.message, instance.running ? 'BUSY' : 'OFFLINE');
++    reportInstrumentError(instance, requestedStart ? 'Could not start acquisition' : 'Could not stop acquisition', error);
+     syncInstrumentControlState(instance);
+   }
+ }
+@@ -1407,7 +1448,8 @@
+     state.devices.items = [];
+     state.devices.selectedId = '';
+     state.devices.warnings = [];
+-    state.devices.error = error.message;
++    state.devices.error = 'Device discovery failed. Press Refresh to try again.';
++    showError('Device discovery failed', error);
+   } finally {
+     state.devices.loading = false;
+     if (state.currentView === 'devices') renderDevices();
+@@ -1446,9 +1488,9 @@
+     $(id).hidden = count === 0;
+     $(`${id}Summary`).textContent = `${label} (${count})`;
+   }
+-  $('devicesStatus').textContent = loading ? 'Looking for USB instruments…'
+-    : error ? `Discovery failed: ${error}`
+-    : [`${items.length} USB instrument${items.length === 1 ? '' : 's'} found.`, ...warnings].join('\n');
++  setStatusMessage($('devicesStatus'), loading ? 'Looking for USB instruments…'
++    : error || [`${items.length} USB instrument${items.length === 1 ? '' : 's'} found.`, ...warnings].join('\n'),
++    !loading && (error || warnings.length) ? 'warning' : 'info');
+   const selected = items.find((item) => item.id === selectedId);
+   $('deviceDetail').classList.toggle('hidden', !selected);
+   $('devicesEmpty').classList.toggle('hidden', Boolean(selected));
+@@ -1469,8 +1511,13 @@
+   $('deviceMetadata').innerHTML = rows.map(([label, value]) => `<span>${label}</span><strong>${escapeHtml(value || '')}</strong>`).join('');
+ }
+ 
+-function setLibraryStatus(text) {
+-  $('libraryExportStatus').textContent = text || '';
++function setLibraryStatus(text, severity = 'info') {
++  setStatusMessage($('libraryExportStatus'), text, severity);
++}
++
++function reportLibraryError(context, error) {
++  setLibraryStatus('Action required. Review the error before retrying.', 'warning');
++  showError(context, error);
+ }
+ 
+ function libraryItemTitle(item) {
+@@ -1604,12 +1651,6 @@
+   await loadLibrary();
+ }
+ 
+-function setDeleteLibraryError(message = '') {
+-  const error = $('deleteLibraryError');
+-  if (!error) return;
+-  error.textContent = message;
+-  error.classList.toggle('hidden', !message);
+-}
+ 
+ function setDeleteLibraryBusy(busy) {
+   state.library.deleteInProgress = Boolean(busy);
+@@ -1626,7 +1667,6 @@
+   state.library.pendingDeleteFile = state.library.selectedFile;
+   $('deleteLibraryRecordName').textContent = title;
+   setDeleteLibraryBusy(false);
+-  setDeleteLibraryError();
+   dialog.classList.remove('closing');
+   if (!dialog.open) dialog.showModal();
+   window.requestAnimationFrame(() => $('cancelDeleteLibraryItem').focus());
+@@ -1636,14 +1676,13 @@
+   const file = state.library.pendingDeleteFile;
+   if (!file || state.library.deleteInProgress) return;
+   setDeleteLibraryBusy(true);
+-  setDeleteLibraryError();
+   try {
+     await api('/api/library/delete', {
+       method: 'POST',
+       body: JSON.stringify({ file })
+     });
+   } catch (error) {
+-    setDeleteLibraryError(error.message || String(error));
++    showError('Could not delete record', error);
+     setDeleteLibraryBusy(false);
+     return;
+   }
+@@ -1656,7 +1695,8 @@
+   try {
+     await loadLibrary();
+   } catch (error) {
+-    setLibraryStatus(`Deleted, but the Library could not refresh: ${error.message || String(error)}`);
++    setLibraryStatus('Record deleted. Refresh the Library to update the list.', 'warning');
++    showError('Record deleted, but Library refresh failed', error);
+   }
+ }
+ 
+@@ -1874,7 +1914,7 @@
+   });
+   if (!$('dmmResource').value && resources.length) $('dmmResource').value = resources[0];
+   setDiscoveredInstrumentCount('dmmResourceCount', payload.valid_count);
+-  setInstrumentStatus(instance, payload.error ? `DMM VISA detection failed: ${payload.error}` : 'Offline', 'OFFLINE');
++  setInstrumentStatus(instance, payload.error ? `DMM VISA discovery unavailable: ${payload.error}` : 'Offline', 'OFFLINE', payload.error ? 'warning' : 'info');
+ }
+ 
+ function readDmmConfig() {
+@@ -1942,7 +1982,7 @@
+     setInstrumentStatus(instance, identity ? `Connected: ${identity}` : 'Connection check passed', 'READY');
+     return payload;
+   } catch (error) {
+-    setInstrumentStatus(instance, `${spec.label[0].toUpperCase()}${spec.label.slice(1)} check failed: ${error.message}`, 'OFFLINE');
++    reportInstrumentError(instance, 'Connection check failed', error);
+     return null;
+   } finally {
+     state.connectionCheckingIds.delete(instanceId);
+@@ -2189,7 +2229,7 @@
+   const typedResource = $('wlmResource').value;
+   const settings = readWlmSettings();
+   if (settings.connection_mode === 'ethernet' && !settings.resource) {
+-    setInstrumentStatus(state.wlm, 'Enter the wavelength meter Ethernet endpoint before checking', 'OFFLINE');
++    setInstrumentStatus(instance, 'Enter the wavelength meter Ethernet endpoint before checking', 'OFFLINE', 'warning');
+     return null;
+   }
+   const isStillActive = () => state.activeInstanceId === instanceId && state.wlm === instance;
+@@ -2216,23 +2256,14 @@
+     const statusText = identity ? `Connected: ${identity}` : 'Connection check passed';
+     const statusBadge = 'READY';
+     if (!isStillActive()) {
+-      instance.statusText = statusText;
+-      instance.badge = statusBadge;
+-      syncLauncherStatus();
++      setInstrumentStatus(instance, statusText, statusBadge);
+       return payload;
+     }
+     $('wlmResource').value = typedResource;
+     setInstrumentStatus(state.wlm, statusText, 'READY');
+     return payload;
+   } catch (error) {
+-    const statusText = `Wavelength meter check failed: ${error.message}`;
+-    if (isStillActive()) {
+-      setInstrumentStatus(state.wlm, statusText, 'OFFLINE');
+-    } else {
+-      instance.statusText = statusText;
+-      instance.badge = 'OFFLINE';
+-      syncLauncherStatus();
+-    }
++    reportInstrumentError(instance, 'Connection check failed', error);
+     return null;
+   } finally {
+     state.connectionCheckingIds.delete(instanceId);
+@@ -2597,18 +2628,19 @@
+   });
+   if (!$('opmResource').value && resources.length) $('opmResource').value = resources[0];
+   setDiscoveredInstrumentCount('opmResourceCount', payload.valid_count);
+-  setInstrumentStatus(instance, opmDiscoveryStatus(payload, payload.valid_count || 0), 'OFFLINE');
++  setInstrumentStatus(instance, opmDiscoveryStatus(payload, payload.valid_count || 0), 'OFFLINE', payload.error || instance.driverUnavailable ? 'warning' : 'info');
+   return payload;
+ }
+ 
+ async function retryOpmDriverDiscovery() {
++  const instance = state.opm;
+   const button = $('opmRetryDriver');
+   button.disabled = true;
+   button.textContent = 'Checking...';
+   try {
+     await refreshOpmResources();
+   } catch (error) {
+-    setInstrumentStatus(state.opm, `TLPMX discovery failed: ${error.message}`, 'OFFLINE');
++    reportInstrumentError(instance, 'Could not discover optical power meters', error);
+   } finally {
+     button.disabled = false;
+     button.textContent = 'Check again';
+@@ -2725,8 +2757,12 @@
+     syncAcquisitionIndicators();
+   }
+   if (payload.event === 'status') {
+-    if (instance.type === 'ufc') setInstrumentStatus(instance, data.text || 'Offline', data.badge);
+-    else setInstrumentStatus(instance, data.text || 'Offline', statusKindToBadge(data.kind));
++    if (data.kind === 'error') {
++      reportInstrumentError(instance, 'Instrument error', data.text, data.details);
++    } else {
++      setInstrumentStatus(instance, data.text || 'Offline', instance.type === 'ufc' ? data.badge : statusKindToBadge(data.kind),
++        data.severity === 'warning' || ['warning', 'reconnecting'].includes(data.kind) ? 'warning' : 'info');
++    }
+   } else if (payload.event === 'data') {
+     if (instance.type !== 'ufc') return;
+     handleData(data, instance);
+@@ -2736,7 +2772,7 @@
+     else if (instance.type === 'wlm') handleWlmAdev(data, instance);
+     else if (instance.type === 'opm') handleOpmAdev(data, instance);
+   } else if (payload.event === 'recoverable_error') {
+-    setInstrumentStatus(instance, `Transient ${data.operation} error #${data.total_errors}; acquisition continues`, 'BUSY');
++    setInstrumentStatus(instance, `Transient ${data.operation} error #${data.total_errors}; acquisition continues`, 'BUSY', 'warning');
+   } else if (payload.event === 'session_opened') {
+     if (instance.type === 'ufc') instance.runPath = data.library_file || 'Session opened';
+   } else if (payload.event === 'sample') {
+@@ -2744,13 +2780,14 @@
+     else if (instance.type === 'wlm') handleWlmSample(data, instance);
+     else if (instance.type === 'opm') handleOpmSample(data, instance);
+   } else if (payload.event === 'done') {
+-    setInstrumentStatus(instance, data.text || 'Stopped', 'READY');
++    setInstrumentStatus(instance, data.text || 'Stopped', 'READY', data.severity || 'info');
+     if (instance.type === 'ufc') {
+       if (data.library_file) instance.runPath = data.library_file;
+       scheduleUfcNoiseUpdate(instance);
+     }
+   } else if (payload.event === 'error') {
+-    setInstrumentStatus(instance, data.text || 'Instrument error', 'OFFLINE');
++    instance.badge = 'OFFLINE';
++    reportInstrumentError(instance, 'Acquisition failed', data.text || 'Instrument error', data.details);
+   }
+ }
+ 
+@@ -2783,7 +2820,7 @@
+   const instance = state.instances[instanceId];
+   if (!instance) return;
+   if (instance.running || instance.pendingAction) {
+-    alert('Stop acquisition before deleting this instrument.');
++    setInstrumentStatus(instance, 'Stop acquisition before deleting this instrument.', null, 'warning');
+     return;
+   }
+   await api(`/api/instruments/${encodeURIComponent(instanceId)}`, { method: 'DELETE' });
+@@ -2836,11 +2873,6 @@
+   $('globalSettingsDialog').showModal();
+ }
+ 
+-function setResetConfigError(message = '') {
+-  const error = $('resetConfigError');
+-  error.textContent = message;
+-  error.classList.toggle('hidden', !message);
+-}
+ 
+ function syncResetConfigSlider() {
+   const slider = $('resetConfigSlider');
+@@ -2865,7 +2897,6 @@
+ function resetResetConfigDialog() {
+   $('resetConfigSlider').value = '0';
+   setResetConfigBusy(false);
+-  setResetConfigError();
+ }
+ 
+ function openResetConfigDialog() {
+@@ -2883,14 +2914,13 @@
+ async function confirmResetConfig() {
+   if (state.resetConfigInProgress || Number($('resetConfigSlider').value) < 100) return;
+   setResetConfigBusy(true);
+-  setResetConfigError();
+   try {
+     const result = await requestConfigReset();
+     if (result?.ok === false) {
+       throw new Error(result.error || 'Configuration reset could not start.');
+     }
+   } catch (error) {
+-    setResetConfigError(error.message || String(error));
++    showError('Could not reset configuration', error);
+     $('resetConfigSlider').value = '0';
+     setResetConfigBusy(false);
+   }
+@@ -2921,7 +2951,8 @@
+   const libraryDir = $('globalLibraryDir').value.trim() || 'runs';
+   state.config = await saveConfigPatch({
+     platform: {
+-      library_dir: libraryDir
++      library_dir: libraryDir,
++      color_mode: state.colorMode
+     }
+   });
+   applyPlatformSettings(state.config.platform || {});
+@@ -2937,6 +2968,17 @@
+ }
+ 
+ function wireUi() {
++  $('errorDialog').addEventListener('close', () => {
++    errorQueue.shift();
++    showNextError();
++  });
++  window.openUfc.onBackendError((message) => showError('Measurement service stopped', message));
++  $('globalSettingsDialog').addEventListener('close', () => {
++    previewColorMode(state.config?.platform?.color_mode || 'auto').catch((error) => showError('Could not restore appearance', error));
++  });
++  document.querySelectorAll('[data-color-mode]').forEach((button) => {
++    button.addEventListener('click', () => previewColorMode(button.dataset.colorMode).catch((error) => showError('Could not change appearance', error)));
++  });
+   const syncMaximized = (maximized) => {
+     document.body.classList.toggle('maximized', maximized);
+     $('maximizeWindow').setAttribute('aria-label', maximized ? 'Restore window' : 'Maximize');
+@@ -2962,7 +3004,6 @@
+   $('renameInstrumentDialog').addEventListener('close', () => {
+     state.renamingInstrumentId = '';
+     state.renameInstrumentSaving = false;
+-    setRenameInstrumentError();
+   });
+   $('renameInstrumentForm').addEventListener('submit', (event) => {
+     event.preventDefault();
+@@ -2971,7 +3012,6 @@
+   $('deleteLibraryDialog').addEventListener('close', () => {
+     state.library.pendingDeleteFile = '';
+     setDeleteLibraryBusy(false);
+-    setDeleteLibraryError();
+   });
+   $('resetConfigDialog').addEventListener('close', () => {
+     if (!state.resetConfigInProgress) resetResetConfigDialog();
+@@ -3013,9 +3053,9 @@
+     toggleAddInstrumentMenu();
+   });
+   document.querySelectorAll('[data-add-instrument-type]').forEach((button) => {
+-    button.addEventListener('click', () => addInstrument(button.dataset.addInstrumentType).catch((error) => alert(error.message)));
+-  });
+-  $('refreshResources').addEventListener('click', () => refreshResources().catch((error) => setInstrumentStatus(state.ufc, error.message, 'OFFLINE')));
++    button.addEventListener('click', () => addInstrument(button.dataset.addInstrumentType).catch((error) => showError('Could not add instrument', error)));
++  });
++  $('refreshResources').addEventListener('click', () => runInstrumentAction(state.ufc, 'Could not discover instruments', refreshResources));
+   $('checkConnection').addEventListener('click', () => checkInstrumentConnection('ufc'));
+   $('runSwitch').addEventListener('change', () => handleRunSwitchChange('ufc', 'runSwitch', startAcquisition, stopAcquisition));
+   $('channel').addEventListener('change', syncUfcTickSliders);
+@@ -3023,20 +3063,19 @@
+   $('openLibrary').addEventListener('click', () => setView('library'));
+   $('openDevices').addEventListener('click', () => setView('devices'));
+   $('refreshDevices').addEventListener('click', loadDevices);
+-  $('refreshLibrary').addEventListener('click', () => loadLibrary().catch((error) => setLibraryStatus(error.message)));
+-  $('renameLibraryItem').addEventListener('click', () => renameLibraryItem().catch((error) => setLibraryStatus(error.message)));
++  $('refreshLibrary').addEventListener('click', () => loadLibrary().catch((error) => reportLibraryError('Could not load Library', error)));
++  $('renameLibraryItem').addEventListener('click', () => renameLibraryItem().catch((error) => reportLibraryError('Could not rename record', error)));
+   $('deleteLibraryItem').addEventListener('click', openDeleteLibraryDialog);
+-  $('exportWaveformCsv').addEventListener('click', () => exportLibrarySeries('waveform').catch((error) => setLibraryStatus(error.message)));
+-  $('exportAdevCsv').addEventListener('click', () => exportLibrarySeries('adev').catch((error) => setLibraryStatus(error.message)));
++  $('exportWaveformCsv').addEventListener('click', () => exportLibrarySeries('waveform').catch((error) => reportLibraryError('Could not export CSV', error)));
++  $('exportAdevCsv').addEventListener('click', () => exportLibrarySeries('adev').catch((error) => reportLibraryError('Could not export CSV', error)));
+   $('openGlobalSettings').addEventListener('click', openGlobalSettings);
+   $('openAbout').addEventListener('click', openAboutDialog);
+-  $('browseGlobalLibrary').addEventListener('click', chooseGlobalOutputDir);
++  $('browseGlobalLibrary').addEventListener('click', () => chooseGlobalOutputDir().catch((error) => showError('Could not open folder picker', error)));
+   $('openResetConfig').addEventListener('click', openResetConfigDialog);
+   $('resetConfigSlider').addEventListener('input', syncResetConfigSlider);
+   $('resetConfigSlider').addEventListener('change', handleResetConfigSliderChange);
+   $('saveGlobalSettings').addEventListener('click', () => saveGlobalSettings().catch((error) => {
+-    $('globalLibraryDir').value = configuredLibraryDir();
+-    console.error(error);
++    showError('Could not save Global Settings', error);
+   }));
+   [
+     'resource',
+@@ -3081,7 +3120,7 @@
+     });
+   });
+ 
+-  $('dmmRefreshResources').addEventListener('click', () => refreshDmmResources().catch((error) => setInstrumentStatus(state.dmm, error.message, 'OFFLINE')));
++  $('dmmRefreshResources').addEventListener('click', () => runInstrumentAction(state.dmm, 'Could not discover instruments', refreshDmmResources));
+   $('dmmCheckConnection').addEventListener('click', () => checkInstrumentConnection('dmm'));
+   document.querySelectorAll('[data-slider-select]').forEach((slider) => {
+     slider.addEventListener('click', (event) => {
+@@ -3117,11 +3156,7 @@
+ 
+   $('wlmCheckEndpoint').addEventListener('click', () => {
+     const instance = state.wlm;
+-    checkWlmEndpoint().catch((error) => {
+-      if (state.activeInstanceId === instance.id && state.wlm === instance) {
+-        setInstrumentStatus(state.wlm, `Wavelength meter check failed: ${error.message}`, 'OFFLINE');
+-      }
+-    });
++    runInstrumentAction(instance, 'Connection check failed', checkWlmEndpoint);
+   });
+   document.querySelectorAll('[data-wlm-connection-mode]').forEach((button) => {
+     button.addEventListener('click', () => selectWlmConnectionMode(button.dataset.wlmConnectionMode));
+@@ -3140,7 +3175,7 @@
+   });
+ 
+   $('opmRefreshResources').addEventListener('click', () => {
+-    refreshOpmResources().catch((error) => setInstrumentStatus(state.opm, error.message, 'OFFLINE'));
++    runInstrumentAction(state.opm, 'Could not discover instruments', refreshOpmResources);
+   });
+   $('opmRetryDriver').addEventListener('click', retryOpmDriverDiscovery);
+   $('opmCheckConnection').addEventListener('click', () => checkInstrumentConnection('opm'));
+@@ -3166,20 +3201,28 @@
+ }
+ 
+ async function init() {
++  wireUi();
+   $('appVersion').textContent = await window.openUfc.appVersion();
+   state.backendUrl = await window.openUfc.backendUrl();
+   createCharts();
+   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', refreshChartTheme);
+-  wireUi();
+   connectInstrumentEvents();
+   state.config = await api('/api/config');
+   applyPlatformSettings(state.config.platform || {});
++  await window.openUfc.setColorMode(state.colorMode);
+   await loadInstruments();
+   setView('home');
+ }
+ 
+ window.addEventListener('DOMContentLoaded', () => {
++  window.addEventListener('unhandledrejection', (event) => {
++    event.preventDefault();
++    showError('Operation failed', event.reason);
++  });
++  window.addEventListener('error', (event) => {
++    if (event.error) showError('Unexpected application error', event.error);
++  });
+   init().catch((error) => {
+-    console.error(error);
+-  });
++    showError('Could not initialize OpenUFC', error);
++  }).finally(() => window.openUfc.ready());
+ });
+--- before/ui/index.html
++++ ui/index.html
+@@ -114,7 +114,7 @@
+               </div>
+ 
+               <div class="status-block">
+-                <div id="statusText">Offline</div>
++                <div id="statusText" class="status-message" role="status" aria-live="polite">Offline</div>
+               </div>
+             </aside>
+ 
+@@ -202,7 +202,7 @@
+                         <input id="fnLogY" type="checkbox" role="switch" checked aria-label="Logarithmic Y scale" />
+                         <span id="fnYScaleLabel">Log</span>
+                       </label>
+-                      <p id="fnStatus" class="analysis-note" role="status" hidden></p>
++                      <p id="fnStatus" class="analysis-note status-message" role="status" aria-live="polite" hidden></p>
+                     </div>
+                   </div>
+                 </section>
+@@ -295,7 +295,7 @@
+               </div>
+ 
+               <div class="status-block">
+-                <div id="dmmStatusText">Offline</div>
++                <div id="dmmStatusText" class="status-message" role="status" aria-live="polite">Offline</div>
+               </div>
+             </aside>
+ 
+@@ -409,7 +409,7 @@
+               </div>
+ 
+               <div class="status-block">
+-                <div id="wlmStatusText">Offline</div>
++                <div id="wlmStatusText" class="status-message" role="status" aria-live="polite">Offline</div>
+               </div>
+             </aside>
+ 
+@@ -572,7 +572,7 @@
+               </div>
+ 
+               <div class="status-block">
+-                <div id="opmStatusText">Offline</div>
++                <div id="opmStatusText" class="status-message" role="status" aria-live="polite">Offline</div>
+               </div>
+             </aside>
+ 
+@@ -638,7 +638,7 @@
+               </details>
+             </aside>
+             <section class="library-detail devices-detail">
+-              <div id="devicesStatus" class="devices-status" role="status" aria-live="polite"></div>
++              <div id="devicesStatus" class="devices-status status-message" role="status" aria-live="polite"></div>
+               <div id="devicesEmpty" class="library-empty raised">No USB instruments found.</div>
+               <section id="deviceDetail" class="library-metadata raised hidden" aria-labelledby="deviceName">
+                 <h2 id="deviceName" class="device-name"></h2>
+@@ -697,7 +697,7 @@
+                   </article>
+                 </div>
+ 
+-                <div id="libraryExportStatus" class="library-export-status"></div>
++                <div id="libraryExportStatus" class="library-export-status status-message" role="status" aria-live="polite"></div>
+               </div>
+             </section>
+           </section>
+@@ -740,6 +740,19 @@
+       </div>
+     </div>
+ 
++    <dialog id="errorDialog" class="modal error-dialog" role="alertdialog" aria-labelledby="errorDialogTitle" aria-describedby="errorContext errorMessage">
++      <form method="dialog" class="modal-form">
++        <header><h2 id="errorDialogTitle">Error</h2></header>
++        <p id="errorContext" class="error-context"></p>
++        <p id="errorMessage" class="error-message"></p>
++        <details id="errorDetails">
++          <summary>Technical details</summary>
++          <pre id="errorDetailsText"></pre>
++        </details>
++        <footer><button class="button primary" value="cancel" type="submit" autofocus>OK</button></footer>
++      </form>
++    </dialog>
++
+     <dialog id="globalSettingsDialog" class="modal">
+       <form method="dialog" class="modal-form">
+         <header>
+@@ -748,6 +761,15 @@
+             <img src="../node_modules/lucide-static/icons/x.svg" alt="" />
+           </button>
+         </header>
++        <div>
++          <span id="colorModeLabel" class="field-label">Appearance</span>
++          <div class="theme-switch" role="group" aria-labelledby="colorModeLabel" aria-describedby="colorModeHelp">
++            <button class="theme-option" type="button" data-color-mode="light" aria-pressed="false">Light</button>
++            <button class="theme-option" type="button" data-color-mode="dark" aria-pressed="false">Dark</button>
++            <button class="theme-option" type="button" data-color-mode="auto" aria-pressed="true">Auto</button>
++          </div>
++          <p id="colorModeHelp" class="modal-copy">Auto follows the Windows app theme.</p>
++        </div>
+         <label>
+           <span>Library folder</span>
+           <div class="inline">
+@@ -786,7 +808,6 @@
+           />
+           <span id="resetConfigSliderLabel" class="reset-confirm-label">Slide to reset and restart</span>
+         </div>
+-        <p id="resetConfigError" class="modal-error hidden" role="status" aria-live="polite"></p>
+         <footer>
+           <button id="cancelResetConfig" class="button raised" value="cancel" type="button" autofocus>Cancel</button>
+         </footer>
+@@ -805,7 +826,6 @@
+           <span>Display name</span>
+           <input id="renameInstrumentName" class="inset-input" maxlength="80" autocomplete="off" />
+         </label>
+-        <p id="renameInstrumentError" class="modal-error hidden" role="status" aria-live="polite"></p>
+         <footer>
+           <button class="button raised" value="cancel" type="button">Cancel</button>
+           <button id="saveRenameInstrument" class="button raised primary" type="submit">Save</button>
+@@ -824,7 +844,6 @@
+         <p id="deleteLibraryDialogCopy" class="modal-copy">
+           Delete <strong id="deleteLibraryRecordName" class="library-delete-record-name"></strong> permanently? This action cannot be undone.
+         </p>
+-        <p id="deleteLibraryError" class="modal-error hidden" role="status" aria-live="polite"></p>
+         <footer>
+           <button id="cancelDeleteLibraryItem" class="button raised" value="cancel" type="button" autofocus>Cancel</button>
+           <button id="confirmDeleteLibraryItem" class="button raised danger" type="submit">Delete</button>
+--- before/ui/styles.css
++++ ui/styles.css
+@@ -22,6 +22,9 @@
+   --chart-grid: rgba(111, 123, 138, 0.22);
+   --teal: #4d9f88;
+   --power: #8a5a0d;
++  --info-text: #3158a8;
++  --warning-text: #805a0f;
++  --error-text: #b02c3a;
+   --bg: #e0e0e0;
+   --card-bg: rgba(230, 230, 230, 0.82);
+   --field-bg: #d7d7d7;
+@@ -1020,6 +1023,7 @@
+   align-items: center;
+ }
+ 
++.theme-switch,
+ .wlm-connection-switch {
+   display: grid;
+   grid-template-columns: repeat(2, minmax(0, 1fr));
+@@ -1031,6 +1035,7 @@
+   box-shadow: inset 3px 3px 8px rgba(174, 174, 174, 0.38), inset -3px -3px 8px rgba(255, 255, 255, 0.5);
+ }
+ 
++.theme-option,
+ .wlm-connection-mode {
+   display: flex;
+   align-items: center;
+@@ -1066,17 +1071,20 @@
+   font-weight: 400;
+ }
+ 
++.theme-option:hover:not(:disabled),
+ .wlm-connection-mode:hover:not(:disabled) {
+   color: var(--text);
+   background: rgba(240, 240, 240, 0.58);
+ }
+ 
++.theme-option[aria-pressed="true"],
+ .wlm-connection-mode[aria-pressed="true"] {
+   color: var(--text);
+   background: var(--button-bg);
+   box-shadow: var(--raised-small);
+ }
+ 
++.theme-option:active:not(:disabled),
+ .wlm-connection-mode:active:not(:disabled) {
+   transform: translateY(1px);
+ }
+@@ -1604,10 +1612,7 @@
+   overflow-wrap: anywhere;
+ }
+ 
+-#statusText,
+-#dmmStatusText,
+-#wlmStatusText,
+-#opmStatusText {
++.status-message {
+   color: var(--blue);
+   font-weight: 900;
+ }
+@@ -2499,6 +2504,9 @@
+     --neutral: #a1adbd;
+     --teal: #70cfca;
+     --power: #e9bd71;
++    --info-text: #8aafff;
++    --warning-text: #e9bd71;
++    --error-text: #f2949e;
+     --edge: #424e5e;
+     --edge-strong: #526174;
+     --icon-filter: brightness(0) invert(1);
+@@ -2527,6 +2535,7 @@
+   .launcher-card:hover,
+   .section-title-button:hover,
+   .add-instrument-option:hover,
++  .theme-option:hover:not(:disabled),
+   .wlm-connection-mode:hover:not(:disabled),
+   .running-acquisition-shortcut:hover { background: #343e4b; }
+   .home-action-button,
+@@ -2558,8 +2567,10 @@
+   .status-block { border-top-color: var(--edge); }
+   .warning-banner { color: #f1ce8c; background: #473a25; }
+ 
++  .theme-switch,
+   .wlm-connection-switch,
+   .dmm-tick-slider { background: #202731; box-shadow: var(--inset); }
++  .theme-option[aria-pressed="true"],
+   .wlm-connection-mode[aria-pressed="true"] { color: var(--blue); background: var(--button-bg); }
+   .inset-input { box-shadow: inset 0 0 0 1px var(--edge-strong); }
+   .inset-input:focus { background: #232d3a; outline: 2px solid var(--blue); outline-offset: 1px; }
+@@ -2606,6 +2617,28 @@
+   ::selection { color: #f3f6ff; background: #3b5c91; }
+ }
+ 
++.status-message { color: var(--info-text); }
++.status-message[data-severity="warning"] { color: var(--warning-text); }
++.theme-switch { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-bottom: 10px; }
++.theme-option:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
++.error-dialog { width: min(620px, 90vw); }
++.error-dialog h2 { color: var(--error-text); }
++.error-context { color: var(--muted); line-height: 1.45; overflow-wrap: anywhere; }
++.error-message { line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; user-select: text; }
++.error-dialog footer { justify-content: flex-end; }
++.error-dialog summary { color: var(--muted); cursor: pointer; }
++.error-dialog pre {
++  max-height: 220px;
++  overflow: auto;
++  padding: 14px;
++  border-radius: var(--radius-md);
++  background: var(--field-bg);
++  color: var(--text);
++  white-space: pre-wrap;
++  overflow-wrap: anywhere;
++  font: 12px/1.5 Consolas, monospace;
++}
++
+ @media (prefers-reduced-motion: reduce) {
+   *,
+   *::before,
+--- before/laser_platform/config.py
++++ laser_platform/config.py
+@@ -70,6 +70,7 @@
+ DEFAULT_CONFIG: dict[str, Any] = {
+     "platform": {
+         "library_dir": "runs",
++        "color_mode": "auto",
+     },
+     "instruments": _default_instruments(),
+ }
+@@ -101,9 +102,13 @@
+     if not isinstance(platform, dict):
+         platform = {}
+     library_dir = str(platform.get("library_dir") or DEFAULT_CONFIG["platform"]["library_dir"])
++    color_mode = platform.get("color_mode", "auto")
++    if color_mode not in ("auto", "light", "dark"):
++        raise ValueError("color mode must be auto, light, or dark")
+     return {
+         "platform": {
+             "library_dir": library_dir,
++            "color_mode": color_mode,
+         },
+         "instruments": _normalize_instruments(config.get("instruments")),
+     }
+--- before/laser_platform/ufc/core.py
++++ laser_platform/ufc/core.py
+@@ -50,12 +50,14 @@
+ @dataclass(frozen=True)
+ class StatusMessage:
+     text: str
++    severity: str = "info"
+ 
+ 
+ @dataclass(frozen=True)
+ class DoneMessage:
+     text: str
+     library_file: Path | None
++    severity: str = "info"
+ 
+ 
+ @dataclass(frozen=True)
+@@ -152,7 +154,7 @@
+             )
+             return sample_count
+         except Exception as exc:
+-            self.out_queue.put(StatusMessage(f"ADEV update failed: {exc}"))
++            self.out_queue.put(StatusMessage(f"ADEV update failed: {exc}", "warning"))
+             return self._last_sample_count
+ 
+     @staticmethod
+@@ -347,6 +349,7 @@
+ 
+             self.out_queue.put(StatusMessage("Stopping acquisition and saving buffered readings"))
+             done_text = "Stopped cleanly"
++            done_severity = "info"
+             final_metadata = {}
+             if acquisition_started:
+                 saved_before_drain = received_samples
+@@ -362,7 +365,8 @@
+                 except Exception as exc:
+                     drain_error = str(exc)
+                     done_text = "Stopped; counter stop/buffer recovery could not be fully confirmed"
+-                    self.out_queue.put(StatusMessage(f"{done_text}: {exc}"))
++                    done_severity = "warning"
++                    self.out_queue.put(StatusMessage(f"{done_text}: {exc}", "warning"))
+                     source.abort()
+                 final_metadata["stop_drain"] = {
+                     "complete": drain_error is None,
+@@ -378,7 +382,7 @@
+                 self.out_queue.put(StatusMessage("Final ADEV update from full file"))
+                 adev_worker.request_final_update()
+                 adev_worker.thread.join(timeout=300.0)
+-            self.out_queue.put(DoneMessage(done_text, library_file))
++            self.out_queue.put(DoneMessage(done_text, library_file, done_severity))
+         except Exception as exc:
+             failure_message = ErrorMessage(str(exc), traceback.format_exc())
+         finally:
+@@ -530,7 +534,7 @@
+             badge = "OFFLINE"
+         else:
+             badge = "BUSY"
+-        return {"event": "status", "data": {"text": msg.text, "badge": badge}}
++        return {"event": "status", "data": {"text": msg.text, "badge": badge, "severity": msg.severity}}
+     if isinstance(msg, DataMessage):
+         return {
+             "event": "data",
+@@ -565,7 +569,7 @@
+     if isinstance(msg, DoneMessage):
+         return {
+             "event": "done",
+-            "data": {"text": msg.text, "library_file": str(msg.library_file) if msg.library_file is not None else None},
++            "data": {"text": msg.text, "library_file": str(msg.library_file) if msg.library_file is not None else None, "severity": msg.severity},
+         }
+     if isinstance(msg, ErrorMessage):
+         return {"event": "error", "data": {"text": msg.text, "details": msg.details}}
+--- before/tests/test_core.py
++++ tests/test_core.py
+@@ -433,14 +433,14 @@
+ def test_configuration_round_trip_and_validation(tmp_path):
+     store = ConfigStore(tmp_path / "nested" / "config.json")
+     config = store.load()
+-    assert config["platform"] == {"library_dir": "runs"}
++    assert config["platform"] == {"library_dir": "runs", "color_mode": "auto"}
+     assert [item["type"] for item in config["instruments"]] == ["ufc", "dmm"]
+     config["instruments"][0]["settings"].update(channel=3, unknown_setting=123)
+     config["instruments"].append(dict(config["instruments"][0]))
+     config["platform"].update(library_dir=str(tmp_path), unknown_setting=True)
+     saved = store.update(config)
+     assert store.load() == json.loads(store.path.read_text()) == saved
+-    assert saved["platform"] == {"library_dir": str(tmp_path)}
++    assert saved["platform"] == {"library_dir": str(tmp_path), "color_mode": "auto"}
+     assert len({item["id"] for item in saved["instruments"]}) == 3
+     assert saved["instruments"][0]["settings"]["channel"] == 3
+     assert "unknown_setting" not in saved["instruments"][0]["settings"]
+@@ -451,6 +451,25 @@
+     with pytest.raises(ValueError, match="unsupported instrument type"):
+         store.update({"instruments": [{"type": "unknown"}]})
+     assert store.update({"instruments": []})["instruments"] == []
++
++
++def test_color_mode_is_persisted_and_invalid_updates_preserve_settings(tmp_path):
++    store = ConfigStore(tmp_path / "config.json")
++    store.load()
++    for mode in ("light", "dark", "auto"):
++        store.update({"platform": {"color_mode": mode}})
++        assert ConfigStore(store.path).load()["platform"]["color_mode"] == mode
++    before = store.path.read_bytes()
++    for invalid in ("system", "unknown", None, []):
++        with pytest.raises(ValueError, match="color mode"):
++            store.update({"platform": {"color_mode": invalid}})
++        assert store.path.read_bytes() == before
++
++
++def test_counter_warning_severity_survives_event_serialization():
++    assert ufc.event_from_message(ufc.StatusMessage("Connected: counter"))["data"]["severity"] == "info"
++    assert ufc.event_from_message(ufc.StatusMessage("ADEV unavailable", "warning"))["data"]["severity"] == "warning"
++    assert ufc.event_from_message(ufc.DoneMessage("Buffer recovery uncertain", None, "warning"))["data"]["severity"] == "warning"
+ 
+ 
+ @pytest.mark.parametrize("target,expected", [
+--- before/tests/test_electron.cjs
++++ tests/test_electron.cjs
+@@ -9,6 +9,21 @@
+ 
+ function loadMain(packaged) {
+   const handlers = new Map();
++  const nativeTheme = { themeSource: 'system' };
++  const windows = [];
++  class BrowserWindow extends EventEmitter {
++    constructor(options) {
++      super();
++      this.visible = Boolean(options.show);
++      this.destroyed = false;
++      this.webContents = new EventEmitter();
++      windows.push(this);
++    }
++    async loadFile() {}
++    show() { this.visible = true; }
++    isDestroyed() { return this.destroyed; }
++    destroy() { this.destroyed = true; this.emit('closed'); }
++  }
+   const child = new EventEmitter();
+   child.stdout = new EventEmitter();
+   child.stderr = new EventEmitter();
+@@ -22,17 +37,18 @@
+   };
+   const context = vm.createContext({
+     require: (name) => {
+-      if (name === 'electron') return { app, ipcMain: { handle: (key, fn) => handlers.set(key, fn) } };
++      if (name === 'electron') return { app, nativeTheme, BrowserWindow, ipcMain: { handle: (key, fn) => handlers.set(key, fn) } };
+       if (name === 'node:child_process') return { spawn: () => child };
+       if (name === 'node:fs') return { mkdirSync: () => {} };
+       return require(name);
+     },
+     process: { argv: [], env: { OPENUFC_PYTHON: 'development-python' }, resourcesPath: path.resolve('resources') },
+     setTimeout: () => {},
++    __dirname: path.resolve('electron'),
+     console
+   });
+   vm.runInContext(source, context);
+-  return { context, child, handlers };
++  return { context, child, handlers, nativeTheme, windows };
+ }
+ 
+ test('packaged app uses its bundled backend and persistent settings directory', () => {
+@@ -62,3 +78,25 @@
+   child.emit('error', new Error('ENOENT'));
+   await assert.rejects(started, /Could not start the backend: ENOENT/);
+ });
++
++test('appearance IPC accepts only the three supported modes', () => {
++  const { handlers, nativeTheme } = loadMain(false);
++  for (const [mode, source] of [['dark', 'dark'], ['light', 'light'], ['auto', 'system']]) {
++    handlers.get('app:set-color-mode')(null, mode);
++    assert.equal(nativeTheme.themeSource, source);
++  }
++  assert.throws(() => handlers.get('app:set-color-mode')(null, 'invalid'), /Invalid color mode/);
++  assert.equal(nativeTheme.themeSource, 'system');
++});
++
++test('startup card remains visible until the renderer reports ready', async () => {
++  const { context, handlers, windows } = loadMain(false);
++  await vm.runInContext('showStartupWindow()', context);
++  assert.equal(windows[0].visible, true);
++  vm.runInContext('createWindow()', context);
++  assert.equal(windows[1].visible, false);
++  assert.equal(windows[0].destroyed, false);
++  handlers.get('app:ready')();
++  assert.equal(windows[1].visible, true);
++  assert.equal(windows[0].destroyed, true);
++});
+--- before/README.md
++++ README.md
+@@ -9,10 +9,23 @@
+ 
+ The desktop UI is built with Electron, vanilla HTML/CSS, and Chart.js. Python provides the local HTTP/SSE backend for VISA access, acquisition, storage, and analysis.
+ 
+-The GUI follows the Windows app color mode automatically, including live theme
+-changes. Dark mode covers controls, dialogs, status indicators, and all plots.
++Global Settings provides **Light**, **Dark**, and **Auto** appearance modes. Auto
++follows the Windows app theme, including live changes. Selecting a mode previews
++it immediately; Save keeps the choice across restarts, while closing without
++saving restores the previous choice. Dark mode covers controls, dialogs, status
++indicators, and all plots.
+ Maximizing fills the desktop work area; restoring brings back the window gutter
+ and rounded corners.
++
++Status messages use blue for information and yellow for recoverable warnings.
++Critical failures open an error dialog with the operation, instrument, and
++available technical details. Concurrent errors are queued; repeated reports of
++the same failure are combined while their dialog is pending.
++
++The portable EXE shows a small OpenUFC card while extracting, then an animated
++waiting indicator until the measurement service and workspace are ready. The
++extraction card is static because the portable launcher exposes a bitmap splash;
++startup does not report a reliable completion percentage.
+ 
+ Every instrument page shows **Sample rate** in Sa/s (samples per second): total
+ acquired samples divided by the acquisition's elapsed time. This cumulative
+@@ -100,7 +113,8 @@
+ 
+ Version **0.1.0** is defined in `package.json` and displayed in the About window.
+ The app icon is editable in `assets/icon.svg`. `npm run build:icon` regenerates
+-the PNG and Windows ICO sizes; the Windows build runs this step automatically.
++the PNG and Windows ICO sizes and the portable startup card; the Windows build
++runs this step automatically.
+ On 64-bit Windows, prepare the build tools once:
+ 
+ ```powershell

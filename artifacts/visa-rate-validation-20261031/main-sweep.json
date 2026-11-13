@@ -1,0 +1,417 @@
+{
+  "identity": "Agilent Technologies,53230A,MY59220164,03.01-1909.4210-1.19-4.16-127-159-35",
+  "resource": "USB0::0x0957::0x1907::MY59220164::0::INSTR",
+  "tests": [
+    {
+      "nominal_rate_hz": 100000,
+      "repetition": 1,
+      "target_wall_s": 35,
+      "statuses": [
+        "Connected: Agilent Technologies,53230A,MY59220164,03.01-1909.4210-1.19-4.16-127-159-35",
+        "Acquisition running",
+        "Re-armed counter after 1,000,000 readings; boundary 1",
+        "Re-armed counter after 1,000,000 readings; boundary 2",
+        "Stopping acquisition and saving buffered readings",
+        "Final ADEV update from full file"
+      ],
+      "failures": [],
+      "adev_updates": 4,
+      "done": "Stopped cleanly",
+      "setup": [
+        {
+          "gate_s": 1e-05,
+          "errors": []
+        },
+        {
+          "gate_s": 1e-05,
+          "errors": []
+        }
+      ],
+      "read_calls": 118,
+      "received_samples": 3000000,
+      "instrument_errors": [],
+      "questionable_event": 0,
+      "pending_readings": 0,
+      "recording_finalized": true,
+      "acquisition_wall_s": 40.83929970000099,
+      "effective_readings_per_s": 73458.65433632612,
+      "restart_count": 2,
+      "full_segment_wall_s": [
+        14.181093400000464,
+        14.528452700000344
+      ],
+      "recording": "C:\\Users\\ThunderWei\\OneDrive\\\u9879\u76ee\\Python Projects\\OpenUFC\\artifacts\\visa-rate-validation-20261031\\recordings\\ufc_20261031_133519.lmp",
+      "saved_samples": 3000000,
+      "valid_samples": 3000000,
+      "received_matches_saved": true,
+      "stop_drain": {
+        "complete": true,
+        "saved_samples": 926627,
+        "error": null
+      },
+      "segment_starts": [
+        0,
+        1000000,
+        2000000
+      ],
+      "mean_frequency_hz": 200057688.89671734,
+      "integrity_pass": true
+    },
+    {
+      "nominal_rate_hz": 500000,
+      "repetition": 1,
+      "target_wall_s": 35,
+      "statuses": [
+        "Connected: Agilent Technologies,53230A,MY59220164,03.01-1909.4210-1.19-4.16-127-159-35",
+        "Acquisition running",
+        "Re-armed counter after 1,000,000 readings; boundary 1",
+        "Re-armed counter after 1,000,000 readings; boundary 2",
+        "Stopping acquisition and saving buffered readings",
+        "Final ADEV update from full file"
+      ],
+      "failures": [],
+      "adev_updates": 5,
+      "done": "Stopped cleanly",
+      "setup": [
+        {
+          "gate_s": 2e-06,
+          "errors": []
+        },
+        {
+          "gate_s": 2e-06,
+          "errors": []
+        }
+      ],
+      "read_calls": 106,
+      "received_samples": 3000000,
+      "instrument_errors": [],
+      "questionable_event": 0,
+      "pending_readings": 0,
+      "recording_finalized": true,
+      "acquisition_wall_s": 40.94444029999977,
+      "effective_readings_per_s": 73270.02098499847,
+      "restart_count": 2,
+      "full_segment_wall_s": [
+        14.32292790000065,
+        14.496886400000221
+      ],
+      "recording": "C:\\Users\\ThunderWei\\OneDrive\\\u9879\u76ee\\Python Projects\\OpenUFC\\artifacts\\visa-rate-validation-20261031\\recordings\\ufc_20261031_133604.lmp",
+      "saved_samples": 3000000,
+      "valid_samples": 3000000,
+      "received_matches_saved": true,
+      "stop_drain": {
+        "complete": true,
+        "saved_samples": 925593,
+        "error": null
+      },
+      "segment_starts": [
+        0,
+        1000000,
+        2000000
+      ],
+      "mean_frequency_hz": 200021718.04713193,
+      "integrity_pass": true
+    },
+    {
+      "nominal_rate_hz": 5000,
+      "repetition": 1,
+      "target_wall_s": 35,
+      "statuses": [
+        "Connected: Agilent Technologies,53230A,MY59220164,03.01-1909.4210-1.19-4.16-127-159-35",
+        "Acquisition running",
+        "Stopping acquisition and saving buffered readings",
+        "Final ADEV update from full file"
+      ],
+      "failures": [],
+      "adev_updates": 7,
+      "done": "Stopped cleanly",
+      "setup": [
+        {
+          "gate_s": 0.0002,
+          "errors": []
+        },
+        {
+          "gate_s": 0.0002,
+          "errors": []
+        }
+      ],
+      "read_calls": 40,
+      "received_samples": 174662,
+      "instrument_errors": [],
+      "questionable_event": 0,
+      "pending_readings": 0,
+      "recording_finalized": true,
+      "acquisition_wall_s": 35.01692820000062,
+      "effective_readings_per_s": 4987.9303804837145,
+      "restart_count": 0,
+      "full_segment_wall_s": [],
+      "recording": "C:\\Users\\ThunderWei\\OneDrive\\\u9879\u76ee\\Python Projects\\OpenUFC\\artifacts\\visa-rate-validation-20261031\\recordings\\ufc_20261031_133649.lmp",
+      "saved_samples": 174662,
+      "valid_samples": 174662,
+      "received_matches_saved": true,
+      "stop_drain": {
+        "complete": true,
+        "saved_samples": 1475,
+        "error": null
+      },
+      "segment_starts": [
+        0
+      ],
+      "mean_frequency_hz": 201158744.46684408,
+      "integrity_pass": true
+    },
+    {
+      "nominal_rate_hz": 10000,
+      "repetition": 1,
+      "target_wall_s": 35,
+      "statuses": [
+        "Connected: Agilent Technologies,53230A,MY59220164,03.01-1909.4210-1.19-4.16-127-159-35",
+        "Acquisition running",
+        "Stopping acquisition and saving buffered readings",
+        "Final ADEV update from full file"
+      ],
+      "failures": [],
+      "adev_updates": 7,
+      "done": "Stopped cleanly",
+      "setup": [
+        {
+          "gate_s": 0.0001,
+          "errors": []
+        },
+        {
+          "gate_s": 0.0001,
+          "errors": []
+        }
+      ],
+      "read_calls": 37,
+      "received_samples": 350658,
+      "instrument_errors": [],
+      "questionable_event": 0,
+      "pending_readings": 0,
+      "recording_finalized": true,
+      "acquisition_wall_s": 35.0134448000008,
+      "effective_readings_per_s": 10014.952884612827,
+      "restart_count": 0,
+      "full_segment_wall_s": [],
+      "recording": "C:\\Users\\ThunderWei\\OneDrive\\\u9879\u76ee\\Python Projects\\OpenUFC\\artifacts\\visa-rate-validation-20261031\\recordings\\ufc_20261031_133725.lmp",
+      "saved_samples": 350658,
+      "valid_samples": 350658,
+      "received_matches_saved": true,
+      "stop_drain": {
+        "complete": true,
+        "saved_samples": 7363,
+        "error": null
+      },
+      "segment_starts": [
+        0
+      ],
+      "mean_frequency_hz": 201915584.38754994,
+      "integrity_pass": true
+    },
+    {
+      "nominal_rate_hz": 50000,
+      "repetition": 1,
+      "target_wall_s": 35,
+      "statuses": [
+        "Connected: Agilent Technologies,53230A,MY59220164,03.01-1909.4210-1.19-4.16-127-159-35",
+        "Acquisition running",
+        "Re-armed counter after 1,000,000 readings; boundary 1",
+        "Stopping acquisition and saving buffered readings",
+        "Final ADEV update from full file"
+      ],
+      "failures": [],
+      "adev_updates": 7,
+      "done": "Stopped cleanly",
+      "setup": [
+        {
+          "gate_s": 2e-05,
+          "errors": []
+        },
+        {
+          "gate_s": 2e-05,
+          "errors": []
+        }
+      ],
+      "read_calls": 48,
+      "received_samples": 1719359,
+      "instrument_errors": [],
+      "questionable_event": 0,
+      "pending_readings": 0,
+      "recording_finalized": true,
+      "acquisition_wall_s": 35.0285614000004,
+      "effective_readings_per_s": 49084.48795159428,
+      "restart_count": 1,
+      "full_segment_wall_s": [
+        20.598426300000938
+      ],
+      "recording": "C:\\Users\\ThunderWei\\OneDrive\\\u9879\u76ee\\Python Projects\\OpenUFC\\artifacts\\visa-rate-validation-20261031\\recordings\\ufc_20261031_133801.lmp",
+      "saved_samples": 1719359,
+      "valid_samples": 1719359,
+      "received_matches_saved": true,
+      "stop_drain": {
+        "complete": true,
+        "saved_samples": 7063,
+        "error": null
+      },
+      "segment_starts": [
+        0,
+        1000000
+      ],
+      "mean_frequency_hz": 201891313.1884844,
+      "integrity_pass": true
+    },
+    {
+      "nominal_rate_hz": 100000,
+      "repetition": 2,
+      "target_wall_s": 35,
+      "statuses": [
+        "Connected: Agilent Technologies,53230A,MY59220164,03.01-1909.4210-1.19-4.16-127-159-35",
+        "Acquisition running",
+        "Re-armed counter after 1,000,000 readings; boundary 1",
+        "Re-armed counter after 1,000,000 readings; boundary 2",
+        "Stopping acquisition and saving buffered readings",
+        "Final ADEV update from full file"
+      ],
+      "failures": [],
+      "adev_updates": 5,
+      "done": "Stopped cleanly",
+      "setup": [
+        {
+          "gate_s": 1e-05,
+          "errors": []
+        },
+        {
+          "gate_s": 1e-05,
+          "errors": []
+        }
+      ],
+      "read_calls": 118,
+      "received_samples": 3000000,
+      "instrument_errors": [],
+      "questionable_event": 0,
+      "pending_readings": 0,
+      "recording_finalized": true,
+      "acquisition_wall_s": 41.4008920999986,
+      "effective_readings_per_s": 72462.2066779112,
+      "restart_count": 2,
+      "full_segment_wall_s": [
+        14.765541699998721,
+        14.591141000000789
+      ],
+      "recording": "C:\\Users\\ThunderWei\\OneDrive\\\u9879\u76ee\\Python Projects\\OpenUFC\\artifacts\\visa-rate-validation-20261031\\recordings\\ufc_20261031_133838.lmp",
+      "saved_samples": 3000000,
+      "valid_samples": 3000000,
+      "received_matches_saved": true,
+      "stop_drain": {
+        "complete": true,
+        "saved_samples": 926181,
+        "error": null
+      },
+      "segment_starts": [
+        0,
+        1000000,
+        2000000
+      ],
+      "mean_frequency_hz": 200351421.75737667,
+      "integrity_pass": true
+    },
+    {
+      "nominal_rate_hz": 500000,
+      "repetition": 2,
+      "target_wall_s": 35,
+      "statuses": [
+        "Connected: Agilent Technologies,53230A,MY59220164,03.01-1909.4210-1.19-4.16-127-159-35",
+        "Acquisition running",
+        "Re-armed counter after read recovery; boundary 1",
+        "Acquisition recovered after 1 transient error(s)",
+        "Stopping acquisition and saving buffered readings",
+        "Final ADEV update from full file"
+      ],
+      "failures": [
+        {
+          "event": "recoverable_error",
+          "data": {
+            "operation": "read",
+            "total_errors": 1,
+            "consecutive_errors": 1,
+            "message": "VI_ERROR_TMO (-1073807339): Timeout expired before operation completed."
+          }
+        }
+      ],
+      "adev_updates": 4,
+      "done": "Stopped cleanly",
+      "setup": [
+        {
+          "gate_s": 2e-06,
+          "errors": []
+        },
+        {
+          "gate_s": 2e-06,
+          "errors": []
+        },
+        {
+          "gate_s": 2e-06,
+          "errors": []
+        }
+      ],
+      "read_calls": 193,
+      "received_samples": 1962112,
+      "instrument_errors": [],
+      "questionable_event": 0,
+      "pending_readings": 0,
+      "recording_finalized": true,
+      "acquisition_wall_s": 39.15063670000018,
+      "effective_readings_per_s": 50116.98826343713,
+      "restart_count": 1,
+      "full_segment_wall_s": [
+        26.464293400000315
+      ],
+      "recording": "C:\\Users\\ThunderWei\\OneDrive\\\u9879\u76ee\\Python Projects\\OpenUFC\\artifacts\\visa-rate-validation-20261031\\recordings\\ufc_20261031_133923.lmp",
+      "saved_samples": 1962112,
+      "valid_samples": 1962112,
+      "received_matches_saved": true,
+      "stop_drain": {
+        "complete": true,
+        "saved_samples": 937351,
+        "error": null
+      },
+      "segment_starts": [
+        0,
+        962112
+      ],
+      "mean_frequency_hz": 199113225.38447174,
+      "integrity_pass": false
+    }
+  ],
+  "method": "Real AcquisitionWorker, disk recording, live ADEV and JSON events; no live GUI rendering.",
+  "original_settings": {
+    "CONF": "\"FREQ +1.00000000000000E+008,+1.00000000000000E-002,(@3)\"",
+    "FORM:DATA": "REAL,64",
+    "FORM:BORD": "NORM",
+    "SENS:FREQ:MODE": "CONT",
+    "SENS:FREQ:GATE:SOUR": "TIME",
+    "SENS:FREQ:GATE:TIME": "+1.00000000000000E-003",
+    "SAMP:COUN": "+1000000",
+    "TRIG:SOUR": "IMM",
+    "TRIG:COUN": "+1",
+    "DISP": "1"
+  },
+  "preexisting_errors": [],
+  "termchar_enabled": false,
+  "failure": "RuntimeError('Data integrity check failed; stopping tests')",
+  "restore_errors": [],
+  "restored_settings": {
+    "CONF": "\"FREQ +1.00000000000000E+008,+1.00000000000000E-002,(@3)\"",
+    "FORM:DATA": "REAL,64",
+    "FORM:BORD": "NORM",
+    "SENS:FREQ:MODE": "CONT",
+    "SENS:FREQ:GATE:SOUR": "TIME",
+    "SENS:FREQ:GATE:TIME": "+1.00000000000000E-003",
+    "SAMP:COUN": "+1000000",
+    "TRIG:SOUR": "IMM",
+    "TRIG:COUN": "+1",
+    "DISP": "1"
+  },
+  "restored_matches_original": true,
+  "final_pending_readings": 0
+}

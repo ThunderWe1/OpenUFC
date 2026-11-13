@@ -1,0 +1,4 @@
+pyvisa>=1.16
+pyvisa-py>=0.8.1
+numpy>=2.0
+telnetlib3>=4.0.5

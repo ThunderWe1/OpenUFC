@@ -1,0 +1,260 @@
+[
+  {
+    "start": 13748.7853586,
+    "end": 13748.7963416,
+    "requested": 5000,
+    "received": 4986
+  },
+  {
+    "start": 13749.7886507,
+    "end": 13749.7985164,
+    "requested": 5000,
+    "received": 4869
+  },
+  {
+    "start": 13750.7545708,
+    "end": 13750.7653739,
+    "requested": 5000,
+    "received": 4902
+  },
+  {
+    "start": 13751.7324407,
+    "end": 13751.7419629,
+    "requested": 5000,
+    "received": 4331
+  },
+  {
+    "start": 13752.6070432,
+    "end": 13752.6158209,
+    "requested": 5000,
+    "received": 4384
+  },
+  {
+    "start": 13753.4756861,
+    "end": 13753.484098,
+    "requested": 5000,
+    "received": 4326
+  },
+  {
+    "start": 13754.3389826,
+    "end": 13754.3467055,
+    "requested": 5000,
+    "received": 4319
+  },
+  {
+    "start": 13755.2124702,
+    "end": 13755.2201676,
+    "requested": 5000,
+    "received": 4328
+  },
+  {
+    "start": 13756.0848798,
+    "end": 13756.0931871,
+    "requested": 5000,
+    "received": 4402
+  },
+  {
+    "start": 13756.9497579,
+    "end": 13756.9577375,
+    "requested": 5000,
+    "received": 4341
+  },
+  {
+    "start": 13757.8267128,
+    "end": 13757.8472615,
+    "requested": 5000,
+    "received": 4344
+  },
+  {
+    "start": 13758.702753,
+    "end": 13758.71039,
+    "requested": 5000,
+    "received": 4329
+  },
+  {
+    "start": 13759.5502635,
+    "end": 13759.5581348,
+    "requested": 5000,
+    "received": 4394
+  },
+  {
+    "start": 13760.443839,
+    "end": 13760.4517675,
+    "requested": 5000,
+    "received": 4341
+  },
+  {
+    "start": 13761.3154822,
+    "end": 13761.3233268,
+    "requested": 5000,
+    "received": 4354
+  },
+  {
+    "start": 13762.1781634,
+    "end": 13762.1862642,
+    "requested": 5000,
+    "received": 4355
+  },
+  {
+    "start": 13763.0513478,
+    "end": 13763.0598756,
+    "requested": 5000,
+    "received": 4338
+  },
+  {
+    "start": 13763.9222164,
+    "end": 13763.9299158,
+    "requested": 5000,
+    "received": 4404
+  },
+  {
+    "start": 13764.799396,
+    "end": 13764.8065262,
+    "requested": 5000,
+    "received": 4312
+  },
+  {
+    "start": 13765.6549574,
+    "end": 13765.6622316,
+    "requested": 5000,
+    "received": 4332
+  },
+  {
+    "start": 13766.5381728,
+    "end": 13766.5588961,
+    "requested": 5000,
+    "received": 4312
+  },
+  {
+    "start": 13767.3876843,
+    "end": 13767.3987243,
+    "requested": 5000,
+    "received": 4293
+  },
+  {
+    "start": 13768.2546754,
+    "end": 13768.2630338,
+    "requested": 5000,
+    "received": 4363
+  },
+  {
+    "start": 13769.1225557,
+    "end": 13769.1312897,
+    "requested": 5000,
+    "received": 4282
+  },
+  {
+    "start": 13769.9838155,
+    "end": 13769.9923064,
+    "requested": 5000,
+    "received": 3790
+  },
+  {
+    "start": 13770.7288133,
+    "end": 13770.7361676,
+    "requested": 5000,
+    "received": 3725
+  },
+  {
+    "start": 13771.4803919,
+    "end": 13771.4876487,
+    "requested": 5000,
+    "received": 3801
+  },
+  {
+    "start": 13772.2386323,
+    "end": 13772.2471046,
+    "requested": 5000,
+    "received": 3799
+  },
+  {
+    "start": 13773.0001896,
+    "end": 13773.0072912,
+    "requested": 5000,
+    "received": 3738
+  },
+  {
+    "start": 13773.742555,
+    "end": 13773.7515537,
+    "requested": 5000,
+    "received": 3814
+  },
+  {
+    "start": 13774.5046782,
+    "end": 13774.5119292,
+    "requested": 5000,
+    "received": 3836
+  },
+  {
+    "start": 13775.2694521,
+    "end": 13775.2771251,
+    "requested": 5000,
+    "received": 3791
+  },
+  {
+    "start": 13776.0398746,
+    "end": 13776.0478893,
+    "requested": 5000,
+    "received": 3851
+  },
+  {
+    "start": 13776.8073767,
+    "end": 13776.8147374,
+    "requested": 5000,
+    "received": 3832
+  },
+  {
+    "start": 13777.5653009,
+    "end": 13777.5732577,
+    "requested": 5000,
+    "received": 3823
+  },
+  {
+    "start": 13778.3387002,
+    "end": 13778.3467689,
+    "requested": 5000,
+    "received": 3759
+  },
+  {
+    "start": 13779.0889501,
+    "end": 13779.0967267,
+    "requested": 5000,
+    "received": 3815
+  },
+  {
+    "start": 13779.8540186,
+    "end": 13779.8615511,
+    "requested": 5000,
+    "received": 3824
+  },
+  {
+    "start": 13780.6242747,
+    "end": 13780.6333712,
+    "requested": 5000,
+    "received": 3775
+  },
+  {
+    "start": 13781.3674825,
+    "end": 13781.3743143,
+    "requested": 5000,
+    "received": 3278
+  },
+  {
+    "start": 13782.020752,
+    "end": 13782.0278218,
+    "requested": 5000,
+    "received": 3322
+  },
+  {
+    "start": 13782.6924047,
+    "end": 13782.6989099,
+    "requested": 5000,
+    "received": 3254
+  },
+  {
+    "start": 13782.8988325,
+    "end": 13782.9031956,
+    "requested": 1135,
+    "received": 1135
+  }
+]

@@ -1,0 +1,39 @@
+<!doctype html><html lang="en"><meta charset="utf-8">
+<title>OpenUFC USB rate validation — 31 October 2026</title>
+<style>body{max-width:1050px;margin:48px auto;padding:0 24px;font:16px/1.6 system-ui;color:#18232c}
+table{border-collapse:collapse;width:100%}th,td{padding:10px;border-bottom:1px solid #ccd4da;text-align:right}
+th:first-child,td:first-child{text-align:left}h1{line-height:1.2}code{overflow-wrap:anywhere}</style>
+<h1>OpenUFC USB rate validation</h1><p>31 October 2026 · Agilent Technologies,53230A,MY59220164,03.01-1909.4210-1.19-4.16-127-159-35</p>
+<p>10 acquisitions, 372.5 seconds total, 15,466,416 readings saved.</p>
+<table><thead><tr><th>Requested readings/s</th><th>Gate readback (µs)</th>
+<th>Delivered readings/s</th><th>Total readings</th><th>Restarts</th><th>Longest read call</th><th>Integrity</th></tr></thead>
+<tbody><tr><td>5,000</td><td>200</td><td>4,926–4,988</td><td>347,205</td><td>0</td><td>0.022 s</td><td>Pass</td></tr><tr><td>10,000</td><td>100</td><td>10,015–10,083</td><td>703,630</td><td>0</td><td>0.035 s</td><td>Pass</td></tr><tr><td>50,000</td><td>20</td><td>49,084–49,515</td><td>3,453,469</td><td>2</td><td>0.102 s</td><td>Pass</td></tr><tr><td>100,000</td><td>10</td><td>72,462–73,459</td><td>6,000,000</td><td>4</td><td>11.140 s</td><td>Pass</td></tr><tr><td>500,000</td><td>2</td><td>50,117–73,270</td><td>4,962,112</td><td>3</td><td>22.012 s</td><td>FAIL</td></tr></tbody></table>
+<h2>What was tested</h2><p>Two approximately 35-second runs at each requested rate, using the
+connected 53230A on channel 3. Tests used the real OpenUFC acquisition worker,
+normal million-reading segments and one-second nominal read batches, background disk
+recording, live and final Allan-deviation calculation, and frontend event JSON serialization.
+The instrument display remained in its existing state. Driver newline detection was
+confirmed disabled by reading the VISA attribute.</p>
+<p>Delivered rate is all received readings divided by the interval from the first INIT
+return to the stop/drain request. It includes restart downtime; small command/timing
+uncertainty remains. Gate readback is the requested instrument setting, not a measurement
+of physical sample spacing. The source signal was live and not independently stabilized.</p>
+<h2>Integrity checks</h2><p>Received arrays and saved file payloads were compared by SHA-256.
+Every saved reading was checked for finite, positive, non-sentinel values. Stop/drain
+completion, zero remaining readings, instrument error queues and questionable-event
+status were checked. Full restart segments are marked in each .lmp file.</p>
+<h2>Limits</h2><p>Passing data integrity does not establish a stable delivery cadence.
+The 100 kHz and 500 kHz settings showed read stalls of up to 11 and 22 seconds, respectively. The second
+500 kHz run also had a read timeout: some acquired readings may have been lost even
+though all successfully received arrays were saved correctly. These are short-duration USB tests, not a long-term stability or measurement
+accuracy certification. GUI rendering and LAN hardware were not included in these timing
+runs. Separate Electron smoke tests exercise all rate choices and a 500,000-reading display
+batch. Waveform, PSD and ADEV time scales still use the nominal selected rate; the 100 kHz
+and 500 kHz presets must not be treated as verified timing. The
+<a href="https://www.keysight.com/us/en/assets/7018-02642/data-sheets/5990-6283.pdf">Keysight datasheet</a>
+specifies a 10 µs minimum continuous gate and up to 75,000 frequency readings/s.</p>
+<p>Original instrument configuration restored and queried values matched:
+<strong>True</strong>.
+Restoration errors: [].</p>
+<p><a href="results.json">Detailed results</a> · <a href="recordings/">Raw .lmp recordings</a> ·
+<a href="validate_hardware.py">Validation script</a></p></html>

@@ -1,0 +1,59 @@
+{
+  "resource": "USB0::0x0957::0x1907::MY59220164::0::INSTR",
+  "tests": [
+    {
+      "requested_rate_hz": 1000000.0,
+      "requested_gate_s": 1e-06,
+      "requested_count": 200000,
+      "streaming": false,
+      "display": 1,
+      "accepted_gate_s": 1e-06,
+      "setup_errors": [],
+      "acquisition_wall_s": 2.700445899999977,
+      "buffer_count_before_read": 200000,
+      "total_wall_s": 3.0324569000003976,
+      "buffer_count_after_read": 0,
+      "questionable_event": 0,
+      "errors": [],
+      "final_gate_s": 1e-06,
+      "received_count": 200000,
+      "valid_count": 200000,
+      "mean_frequency_hz": 230075332.14562306,
+      "std_frequency_hz": 993658.865776337,
+      "min_frequency_hz": 227033768.29047,
+      "max_frequency_hz": 232238393.49467748,
+      "usb_transfer_s": 0.33081070000116597,
+      "read_calls": 1,
+      "wall_readings_per_s": 74061.84289787168,
+      "usb_readings_per_s": 604575.3659095522
+    }
+  ],
+  "termchar_enabled": false,
+  "chunk_bytes": 20480,
+  "identity": "Agilent Technologies,53230A,MY59220164,03.01-1909.4210-1.19-4.16-127-159-35",
+  "configuration": "\"FREQ +1.00000000000000E+008,+1.00000000000000E-002,(@3)\"",
+  "original_settings": {
+    "FORM:DATA": "REAL,64",
+    "FORM:BORD": "NORM",
+    "SENS:FREQ:MODE": "CONT",
+    "SENS:FREQ:GATE:SOUR": "TIME",
+    "SENS:FREQ:GATE:TIME": "+1.00000000000000E-003",
+    "SAMP:COUN": "+1000000",
+    "TRIG:SOUR": "IMM",
+    "TRIG:COUN": "+1",
+    "DISP": "1"
+  },
+  "preexisting_errors": [],
+  "restore_errors": [],
+  "restored_settings": {
+    "FORM:DATA": "REAL,64",
+    "FORM:BORD": "NORM",
+    "SENS:FREQ:MODE": "CONT",
+    "SENS:FREQ:GATE:SOUR": "TIME",
+    "SENS:FREQ:GATE:TIME": "+1.00000000000000E-003",
+    "SAMP:COUN": "+1000000",
+    "TRIG:SOUR": "IMM",
+    "TRIG:COUN": "+1",
+    "DISP": "1"
+  }
+}

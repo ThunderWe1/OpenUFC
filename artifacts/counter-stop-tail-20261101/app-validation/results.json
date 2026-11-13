@@ -1,0 +1,179 @@
+{
+  "original": {
+    "FORM:DATA": "REAL,64",
+    "FORM:BORD": "NORM",
+    "SENS:FREQ:MODE": "CONT",
+    "SENS:FREQ:GATE:SOUR": "TIME",
+    "SENS:FREQ:GATE:TIME": "+2.00000000000000E-005",
+    "SAMP:COUN": "+1000000",
+    "TRIG:SOUR": "IMM",
+    "TRIG:COUN": "+1"
+  },
+  "runs": [
+    {
+      "file": "ufc_20261101_220053.lmp",
+      "requested_stop_s": 0.7,
+      "stop_wall_s": 0.18145629999344237,
+      "count": 11262,
+      "tail": [
+        521756761.691902,
+        521806181.2916232,
+        521732372.9489459
+      ],
+      "median_hz": 523137800.75464666,
+      "minimum_hz": 521037110.84091115,
+      "stop_drain": {
+        "complete": true,
+        "saved_samples": 11262,
+        "discarded_after_stop": 3585,
+        "error": null
+      }
+    },
+    {
+      "file": "ufc_20261101_220054.lmp",
+      "requested_stop_s": 1.17,
+      "stop_wall_s": 0.11824670000351034,
+      "count": 32987,
+      "tail": [
+        525103628.85372293,
+        525041619.37146235,
+        524960977.4977586
+      ],
+      "median_hz": 524536826.1543519,
+      "minimum_hz": 522080509.4934373,
+      "stop_drain": {
+        "complete": true,
+        "saved_samples": 0,
+        "discarded_after_stop": 2852,
+        "error": null
+      }
+    },
+    {
+      "file": "ufc_20261101_220056.lmp",
+      "requested_stop_s": 1.43,
+      "stop_wall_s": 0.18221930001163855,
+      "count": 46174,
+      "tail": [
+        522177063.29202753,
+        522209383.0794611,
+        522157724.2301499
+      ],
+      "median_hz": 525232197.2318678,
+      "minimum_hz": 520468683.0220802,
+      "stop_drain": {
+        "complete": true,
+        "saved_samples": 13190,
+        "discarded_after_stop": 4513,
+        "error": null
+      }
+    },
+    {
+      "file": "ufc_20261101_220057.lmp",
+      "requested_stop_s": 2.13,
+      "stop_wall_s": 0.14719829999376088,
+      "count": 83722,
+      "tail": [
+        527013505.64834684,
+        527167506.0664697,
+        527195384.9190536
+      ],
+      "median_hz": 526555830.4569856,
+      "minimum_hz": 501048622.5900192,
+      "stop_drain": {
+        "complete": true,
+        "saved_samples": 18807,
+        "discarded_after_stop": 3768,
+        "error": null
+      }
+    },
+    {
+      "file": "ufc_20261101_220100.lmp",
+      "requested_stop_s": 0.83,
+      "stop_wall_s": 0.18892140001116786,
+      "count": 16092,
+      "tail": [
+        528228553.2820455,
+        528341473.86616606,
+        528278933.17298687
+      ],
+      "median_hz": 526740300.3677969,
+      "minimum_hz": 523117724.384512,
+      "stop_drain": {
+        "complete": true,
+        "saved_samples": 16092,
+        "discarded_after_stop": 4918,
+        "error": null
+      }
+    },
+    {
+      "file": "ufc_20261101_220101.lmp",
+      "requested_stop_s": 1.67,
+      "stop_wall_s": 0.1544310999888694,
+      "count": 58403,
+      "tail": [
+        526508933.8317129,
+        526403918.3801802,
+        526365259.4495856
+      ],
+      "median_hz": 526779295.55040604,
+      "minimum_hz": 523575680.89017,
+      "stop_drain": {
+        "complete": true,
+        "saved_samples": 24722,
+        "discarded_after_stop": 5439,
+        "error": null
+      }
+    },
+    {
+      "file": "ufc_20261101_220102.lmp",
+      "requested_stop_s": 2.27,
+      "stop_wall_s": 0.16173400000843685,
+      "count": 87330,
+      "tail": [
+        529010907.7122893,
+        528992442.5800428,
+        528897188.107774
+      ],
+      "median_hz": 527349477.50725836,
+      "minimum_hz": 522153349.2984955,
+      "stop_drain": {
+        "complete": true,
+        "saved_samples": 23976,
+        "discarded_after_stop": 4803,
+        "error": null
+      }
+    },
+    {
+      "file": "ufc_20261101_220105.lmp",
+      "requested_stop_s": 1.91,
+      "stop_wall_s": 0.14842669999052305,
+      "count": 68906,
+      "tail": [
+        527926018.18006945,
+        527896122.00333625,
+        527861977.49563044
+      ],
+      "median_hz": 528118749.3574605,
+      "minimum_hz": 522708722.71244484,
+      "stop_drain": {
+        "complete": true,
+        "saved_samples": 5832,
+        "discarded_after_stop": 6272,
+        "error": null
+      }
+    }
+  ],
+  "restored": {
+    "FORM:DATA": "REAL,64",
+    "FORM:BORD": "NORM",
+    "SENS:FREQ:MODE": "CONT",
+    "SENS:FREQ:GATE:SOUR": "TIME",
+    "SENS:FREQ:GATE:TIME": "+2.00000000000000E-005",
+    "SAMP:COUN": "+1000000",
+    "TRIG:SOUR": "IMM",
+    "TRIG:COUN": "+1"
+  },
+  "configuration_restored": true,
+  "restore_error": "+0,\"No error\"",
+  "remaining_readings": 0
+}

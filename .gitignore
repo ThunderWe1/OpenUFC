@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.pytest-tmp*/
+*.egg-info/
+
+# Local virtual environments and build toolchains
+.venv/
+venv/
+.build-venv*/
+
+# Node
+node_modules/
+npm-debug.log*
+
+# Build outputs and local recordings
+build/
+dist/
+dist-*/
+runs/
+
+# Local settings and measurement files
+config.json
+*.lmp
+
+# Raw validation data and pre-change source snapshots (keep the small reports)
+artifacts/**/recordings/
+artifacts/**/source-before/
+artifacts/**/*.npy
+
+# Editor and OS files
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini
+.DS_Store
+*.log
+*.tmp

@@ -1,0 +1,1006 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LASER MEASUREMENT PLATFORM</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="home-view">
+    <div class="window-shell">
+      <header class="title-bar">
+        <div class="title-drag">
+          <span class="status-pill offline" id="connectionBadge">OFFLINE</span>
+        </div>
+        <div class="window-controls">
+          <button id="minimizeWindow" class="window-button" type="button" aria-label="Minimize">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" /></svg>
+          </button>
+          <button id="maximizeWindow" class="window-button" type="button" aria-label="Maximize">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2" /></svg>
+          </button>
+          <button id="closeWindow" class="window-button close" type="button" aria-label="Close">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+          </button>
+        </div>
+      </header>
+
+      <main class="app-shell">
+        <section class="view active launcher-view" data-view="home">
+          <div id="launcherGrid" class="launcher-grid"></div>
+        </section>
+
+        <section class="view" data-view="ufc">
+          <section class="dashboard">
+            <aside class="control-panel raised">
+              <button class="section-title section-title-button" type="button" data-return-home>UNIVERSAL FREQUENCY COUNTER</button>
+
+              <div class="resource-label-row">
+                <label class="field-label" for="resource">VISA resource</label>
+                <span id="ufcResourceCount" class="resource-count-badge" aria-label="0 discovered instruments" aria-live="polite">0</span>
+              </div>
+              <div class="inline">
+                <input id="resource" class="inset-input" list="resourceList" autocomplete="off" />
+                <datalist id="resourceList"></datalist>
+                <button id="refreshResources" class="instrument-icon-button" type="button" title="Refresh resources" aria-label="Refresh frequency counter resources">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5"></path>
+                    <path d="M4 13a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5"></path>
+                  </svg>
+                </button>
+                <button id="checkConnection" class="instrument-icon-button" type="button" title="Check connection" aria-label="Check frequency counter connection">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M6.3 20.3a2.4 2.4 0 0 0 3.4 0L12 18l-6-6-2.3 2.3a2.4 2.4 0 0 0 0 3.4Z"></path>
+                    <path d="m2 22 3-3"></path>
+                    <path d="M7.5 13.5 10 11"></path>
+                    <path d="M10.5 16.5 13 14"></path>
+                    <path d="m18 3-4 4h6l-4 4"></path>
+                  </svg>
+                </button>
+              </div>
+
+              <div class="dmm-tick-controls">
+                <section class="dmm-tick-slider" data-slider-select="channel">
+                  <div class="dmm-tick-header field-label">Channel</div>
+                  <select id="channel" class="dmm-source-select" aria-label="Channel">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                  </select>
+                  <div class="dmm-tick-body">
+                    <div class="dmm-tick-track" aria-hidden="true">
+                      <span class="dmm-tick-fill"></span>
+                      <span class="dmm-tick-knob"></span>
+                    </div>
+                    <div class="dmm-tick-options" data-slider-options></div>
+                  </div>
+                </section>
+
+                <section class="dmm-tick-slider" data-slider-select="sampleRate">
+                  <div class="dmm-tick-header field-label">Nominal sample rate</div>
+                  <select id="sampleRate" class="dmm-source-select" aria-label="Sample rate">
+                    <option value="1">1 Hz</option>
+                    <option value="10">10 Hz</option>
+                    <option value="100">100 Hz</option>
+                    <option value="1000" selected>1 kHz</option>
+                    <option value="5000">5 kHz</option>
+                    <option value="10000">10 kHz</option>
+                    <option value="50000">50 kHz</option>
+                  </select>
+                  <div class="dmm-tick-body">
+                    <div class="dmm-tick-track" aria-hidden="true">
+                      <span class="dmm-tick-fill"></span>
+                      <span class="dmm-tick-knob"></span>
+                    </div>
+                    <div class="dmm-tick-options" data-slider-options></div>
+                  </div>
+                </section>
+              </div>
+
+              <label class="wide-label">
+                <span>Name Acquisition</span>
+                <input id="acquisitionName" class="inset-input" placeholder="Optional" />
+              </label>
+
+              <div class="run-control">
+                <span>Stop</span>
+                <div class="toggle-cont">
+                  <input id="runSwitch" class="toggle-input" type="checkbox" />
+                  <label class="toggle-label" for="runSwitch" aria-label="Run acquisition">
+                    <span class="cont-label-play"><span class="label-play"></span></span>
+                  </label>
+                </div>
+                <span>Run</span>
+              </div>
+
+              <div class="status-block">
+                <div id="statusText" class="status-message" role="status" aria-live="polite">Offline</div>
+              </div>
+            </aside>
+
+            <section class="work-area">
+              <div id="ufcNumberIndicators" class="metric-grid raised ufc-metrics number-indicators">
+                <article class="metric-card">
+                  <div class="metric-accent blue"></div>
+                  <span>Frequency</span>
+                  <strong id="frequencyMetric">--</strong>
+                  <em id="frequencyUnit">MHz</em>
+                </article>
+                <article class="metric-card">
+                  <div class="metric-accent amber"></div>
+                  <span title="Total acquired samples / total elapsed time">Sample rate</span>
+                  <strong id="sampleRateMetric">--</strong>
+                  <em>Sa/s</em>
+                </article>
+                <article class="metric-card">
+                  <div class="metric-accent green"></div>
+                  <span>Elapsed</span>
+                  <strong id="elapsedMetric">0.0</strong>
+                  <em>s</em>
+                </article>
+                <article class="metric-card">
+                  <div class="metric-accent red"></div>
+                  <span>ADEV at 1 s</span>
+                  <strong id="adevMetric">--</strong>
+                  <em>1 s</em>
+                </article>
+              </div>
+
+              <div class="plot-panel raised ufc-plot-panel">
+                <section class="waveform-section">
+                  <div class="analysis-tabs waveform-tabs" role="tablist" aria-label="Frequency waveform view">
+                    <button id="ufcRecentWaveformTab" type="button" role="tab" aria-selected="true" aria-controls="ufcWaveformPanel" data-waveform-type="ufc" data-waveform-tab="recent">Recent</button>
+                    <button id="ufcFullWaveformTab" type="button" role="tab" aria-selected="false" aria-controls="ufcWaveformPanel" tabindex="-1" data-waveform-type="ufc" data-waveform-tab="full">Full</button>
+                  </div>
+                  <div id="ufcWaveformPanel" class="waveform-panel" role="tabpanel" aria-labelledby="ufcRecentWaveformTab">
+                    <div class="plot-well">
+                      <canvas id="frequencyChart"></canvas>
+                    </div>
+                    <p id="ufcFullWaveformStatus" class="waveform-status status-message" role="status" aria-live="polite" hidden></p>
+                  </div>
+                </section>
+                <section class="ufc-analysis">
+                  <div class="analysis-tabs" role="tablist" aria-label="Frequency analysis">
+                    <button id="ufcAdevTab" type="button" role="tab" aria-selected="true" aria-controls="ufcAdevPanel" data-ufc-analysis="adev">ADEV</button>
+                    <button id="ufcFnTab" type="button" role="tab" aria-selected="false" aria-controls="ufcFnPanel" tabindex="-1" data-ufc-analysis="fn">FN</button>
+                  </div>
+                  <div id="ufcAdevPanel" class="analysis-panel" role="tabpanel" aria-labelledby="ufcAdevTab">
+                    <div class="plot-well"><canvas id="adevChart"></canvas></div>
+                    <div class="analysis-settings" aria-label="ADEV calculation settings">
+                      <label id="wavelengthRow" class="analysis-field">
+                        <span>Wavelength (nm)</span>
+                        <input id="wavelength" class="inset-input" value="851.683" />
+                      </label>
+                      <div class="adev-normalization">
+                        <label class="check-row">
+                          <input id="divideOpticalFrequency" type="checkbox" checked />
+                          <span>Normalize by optical frequency</span>
+                        </label>
+                        <label class="check-row">
+                          <input id="divideSqrt2" type="checkbox" checked />
+                          <span>Divide by √2</span>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                  <div id="ufcFnPanel" class="analysis-panel" role="tabpanel" aria-labelledby="ufcFnTab" hidden>
+                    <div class="plot-well"><canvas id="frequencyNoiseChart"></canvas></div>
+                    <div class="analysis-settings" aria-label="Frequency noise calculation settings">
+                      <label class="analysis-field"><span>Segment length</span>
+                        <select id="fnSegmentLength" class="inset-input">
+                          <option value="16">16 samples</option><option value="64">64 samples</option>
+                          <option value="256">256 samples</option><option value="1024" selected>1,024 samples</option>
+                          <option value="4096">4,096 samples</option><option value="16384">16,384 samples</option>
+                        </select>
+                      </label>
+                      <label class="analysis-field"><span>Window</span>
+                        <select id="fnWindow" class="inset-input">
+                          <option value="hann">Hann</option><option value="hamming">Hamming</option><option value="boxcar">Rectangular</option>
+                        </select>
+                      </label>
+                      <label class="analysis-field"><span>Overlap</span>
+                        <select id="fnOverlap" class="inset-input">
+                          <option value="0">0%</option><option value="50" selected>50%</option><option value="75">75%</option>
+                        </select>
+                      </label>
+                      <label class="axis-toggle"><span>X scale</span>
+                        <input id="fnLogX" type="checkbox" role="switch" checked aria-label="Logarithmic X scale" />
+                        <span id="fnXScaleLabel">Log</span>
+                      </label>
+                      <label class="axis-toggle"><span>Y scale</span>
+                        <input id="fnLogY" type="checkbox" role="switch" checked aria-label="Logarithmic Y scale" />
+                        <span id="fnYScaleLabel">Log</span>
+                      </label>
+                      <p id="fnStatus" class="analysis-note status-message" role="status" aria-live="polite" hidden></p>
+                    </div>
+                  </div>
+                </section>
+              </div>
+            </section>
+          </section>
+        </section>
+
+        <section class="view" data-view="dmm">
+          <section class="dashboard">
+            <aside class="control-panel raised">
+              <button class="section-title section-title-button" type="button" data-return-home>DIGITAL MULTIMETER</button>
+
+              <div class="resource-label-row">
+                <label class="field-label" for="dmmResource">VISA resource</label>
+                <span id="dmmResourceCount" class="resource-count-badge" aria-label="0 discovered instruments" aria-live="polite">0</span>
+              </div>
+              <div class="inline">
+                <input id="dmmResource" class="inset-input" list="dmmResourceList" autocomplete="off" />
+                <datalist id="dmmResourceList"></datalist>
+                <button id="dmmRefreshResources" class="instrument-icon-button" type="button" title="Refresh resources" aria-label="Refresh DMM resources">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5"></path>
+                    <path d="M4 13a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5"></path>
+                  </svg>
+                </button>
+                <button id="dmmCheckConnection" class="instrument-icon-button" type="button" title="Check connection" aria-label="Check DMM connection">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M6.3 20.3a2.4 2.4 0 0 0 3.4 0L12 18l-6-6-2.3 2.3a2.4 2.4 0 0 0 0 3.4Z"></path>
+                    <path d="m2 22 3-3"></path>
+                    <path d="M7.5 13.5 10 11"></path>
+                    <path d="M10.5 16.5 13 14"></path>
+                    <path d="m18 3-4 4h6l-4 4"></path>
+                  </svg>
+                </button>
+              </div>
+
+              <label class="wide-label">
+                <span>Function</span>
+                <select id="dmmFunction" class="inset-input"></select>
+              </label>
+
+              <label class="check-row">
+                <input id="dmmAutorange" type="checkbox" checked />
+                <span>Enable autorange</span>
+              </label>
+
+              <div class="dmm-tick-controls">
+                <section class="dmm-tick-slider" data-slider-select="dmmRange">
+                  <div class="dmm-tick-header field-label">Manual range</div>
+                  <select id="dmmRange" class="dmm-source-select" aria-label="Manual range"></select>
+                  <div class="dmm-tick-body">
+                    <div class="dmm-tick-track" aria-hidden="true">
+                      <span class="dmm-tick-fill"></span>
+                      <span class="dmm-tick-knob"></span>
+                    </div>
+                    <div class="dmm-tick-options" data-slider-options></div>
+                  </div>
+                </section>
+
+                <section class="dmm-tick-slider" data-slider-select="dmmNplc">
+                  <div class="dmm-tick-header field-label">NPLC</div>
+                  <select id="dmmNplc" class="dmm-source-select" aria-label="NPLC"></select>
+                  <div class="dmm-tick-body">
+                    <div class="dmm-tick-track" aria-hidden="true">
+                      <span class="dmm-tick-fill"></span>
+                      <span class="dmm-tick-knob"></span>
+                    </div>
+                    <div class="dmm-tick-options" data-slider-options></div>
+                  </div>
+                </section>
+              </div>
+
+              <div id="dmmLeadWarning" class="warning-banner hidden">Current mode selected. Confirm the leads are moved to the current input before logging.</div>
+
+              <label class="wide-label">
+                <span>Name Acquisition</span>
+                <input id="dmmAcquisitionName" class="inset-input" placeholder="Optional" />
+              </label>
+
+              <div class="run-control">
+                <span>Stop</span>
+                <div class="toggle-cont">
+                  <input id="dmmRunSwitch" class="toggle-input" type="checkbox" />
+                  <label class="toggle-label" for="dmmRunSwitch" aria-label="Run DMM acquisition">
+                    <span class="cont-label-play"><span class="label-play"></span></span>
+                  </label>
+                </div>
+                <span>Run</span>
+              </div>
+
+              <div class="status-block">
+                <div id="dmmStatusText" class="status-message" role="status" aria-live="polite">Offline</div>
+              </div>
+            </aside>
+
+            <section class="work-area">
+              <div id="dmmNumberIndicators" class="metric-grid raised dmm-metrics number-indicators">
+                <article class="metric-card">
+                  <div class="metric-accent blue"></div>
+                  <span>Latest</span>
+                  <strong id="dmmValueMetric">--</strong>
+                  <em id="dmmUnitMetric">V</em>
+                </article>
+                <article class="metric-card">
+                  <div class="metric-accent green"></div>
+                  <span>Minimum</span>
+                  <strong id="dmmMinMetric">--</strong>
+                  <em>min</em>
+                </article>
+                <article class="metric-card">
+                  <div class="metric-accent amber"></div>
+                  <span>Maximum</span>
+                  <strong id="dmmMaxMetric">--</strong>
+                  <em>max</em>
+                </article>
+                <article class="metric-card">
+                  <div class="metric-accent red"></div>
+                  <span>Average</span>
+                  <strong id="dmmAvgMetric">--</strong>
+                  <em>avg</em>
+                </article>
+                <article class="metric-card">
+                  <div class="metric-accent neutral"></div>
+                  <span title="Total acquired samples / total elapsed time">Sample rate</span>
+                  <strong id="dmmSampleRateMetric">--</strong>
+                  <em>Sa/s</em>
+                </article>
+              </div>
+
+              <div class="plot-panel raised dmm-plot-panel">
+                <section class="waveform-section">
+                  <div class="analysis-tabs waveform-tabs" role="tablist" aria-label="DMM waveform view">
+                    <button id="dmmRecentWaveformTab" type="button" role="tab" aria-selected="true" aria-controls="dmmWaveformPanel" data-waveform-type="dmm" data-waveform-tab="recent">Recent</button>
+                    <button id="dmmFullWaveformTab" type="button" role="tab" aria-selected="false" aria-controls="dmmWaveformPanel" tabindex="-1" data-waveform-type="dmm" data-waveform-tab="full">Full</button>
+                  </div>
+                  <div id="dmmWaveformPanel" class="waveform-panel" role="tabpanel" aria-labelledby="dmmRecentWaveformTab">
+                    <div class="plot-well">
+                      <canvas id="dmmTrendChart"></canvas>
+                    </div>
+                    <p id="dmmFullWaveformStatus" class="waveform-status status-message" role="status" aria-live="polite" hidden></p>
+                  </div>
+                </section>
+                <div class="plot-well">
+                  <canvas id="dmmAdevChart"></canvas>
+                </div>
+              </div>
+            </section>
+          </section>
+        </section>
+
+        <section class="view" data-view="wlm">
+          <section class="dashboard">
+            <aside class="control-panel raised">
+              <button class="section-title section-title-button" type="button" data-return-home>WAVELENGTH METER</button>
+
+              <div class="wlm-connection-row">
+                <div id="wlmConnectionMode" class="wlm-connection-switch" role="group" aria-label="Connection mode">
+                  <button id="wlmUsbMode" class="wlm-connection-mode" type="button" data-wlm-connection-mode="usb" aria-pressed="true">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <circle cx="10" cy="7" r="1"></circle>
+                      <circle cx="4" cy="20" r="1"></circle>
+                      <path d="M4.7 19.3 19 5"></path>
+                      <path d="m21 3-3 1 2 2Z"></path>
+                      <path d="M9.26 7.68 5 12l2 5"></path>
+                      <path d="m10 14 5 2 3.5-3.5"></path>
+                      <path d="m18 12 1-1 1 1-1 1Z"></path>
+                    </svg>
+                    <span>USB</span>
+                  </button>
+                  <button id="wlmEthernetMode" class="wlm-connection-mode" type="button" data-wlm-connection-mode="ethernet" aria-pressed="false">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="m15 20 3-3h2a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h2l3 3Z"></path>
+                      <path d="M6 8v1"></path>
+                      <path d="M10 8v1"></path>
+                      <path d="M14 8v1"></path>
+                      <path d="M18 8v1"></path>
+                    </svg>
+                    <span>Ethernet</span>
+                  </button>
+                </div>
+                <button id="wlmCheckEndpoint" class="instrument-icon-button" type="button" title="Check connection" aria-label="Check wavelength meter connection">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M6.3 20.3a2.4 2.4 0 0 0 3.4 0L12 18l-6-6-2.3 2.3a2.4 2.4 0 0 0 0 3.4Z"></path>
+                    <path d="m2 22 3-3"></path>
+                    <path d="M7.5 13.5 10 11"></path>
+                    <path d="M10.5 16.5 13 14"></path>
+                    <path d="m18 3-4 4h6l-4 4"></path>
+                  </svg>
+                </button>
+              </div>
+
+              <label id="wlmEndpointLabel" class="field-label" for="wlmResource">Endpoint</label>
+              <div id="wlmEthernetResourceRow" class="wlm-resource-row">
+                <input id="wlmResource" class="inset-input" list="wlmResourceList" autocomplete="off" />
+                <datalist id="wlmResourceList"></datalist>
+              </div>
+
+              <label class="wide-label">
+                <span>Name Acquisition</span>
+                <input id="wlmAcquisitionName" class="inset-input" placeholder="Optional" />
+              </label>
+
+              <div class="run-control">
+                <span>Stop</span>
+                <div class="toggle-cont">
+                  <input id="wlmRunSwitch" class="toggle-input" type="checkbox" />
+                  <label class="toggle-label" for="wlmRunSwitch" aria-label="Run wavelength acquisition">
+                    <span class="cont-label-play"><span class="label-play"></span></span>
+                  </label>
+                </div>
+                <span>Run</span>
+              </div>
+
+              <div class="status-block">
+                <div id="wlmStatusText" class="status-message" role="status" aria-live="polite">Offline</div>
+              </div>
+            </aside>
+
+            <section class="work-area">
+              <div id="wlmNumberIndicators" class="metric-grid raised wlm-metrics number-indicators">
+                <article class="metric-card">
+                  <div class="metric-accent blue"></div>
+                  <span>Latest</span>
+                  <strong id="wlmValueMetric">--</strong>
+                  <em>nm</em>
+                </article>
+                <article class="metric-card">
+                  <div class="metric-accent green"></div>
+                  <span>Minimum</span>
+                  <strong id="wlmMinMetric">--</strong>
+                  <em>nm</em>
+                </article>
+                <article class="metric-card">
+                  <div class="metric-accent amber"></div>
+                  <span>Maximum</span>
+                  <strong id="wlmMaxMetric">--</strong>
+                  <em>nm</em>
+                </article>
+                <article class="metric-card">
+                  <div class="metric-accent red"></div>
+                  <span>Average</span>
+                  <strong id="wlmAvgMetric">--</strong>
+                  <em>nm</em>
+                </article>
+                <article class="metric-card">
+                  <div class="metric-accent neutral"></div>
+                  <span title="Total acquired samples / total elapsed time">Sample rate</span>
+                  <strong id="wlmSampleRateMetric">--</strong>
+                  <em>Sa/s</em>
+                </article>
+              </div>
+
+              <div class="plot-panel raised wlm-plot-panel">
+                <section class="waveform-section">
+                  <div class="analysis-tabs waveform-tabs" role="tablist" aria-label="Wavelength waveform view">
+                    <button id="wlmRecentWaveformTab" type="button" role="tab" aria-selected="true" aria-controls="wlmWaveformPanel" data-waveform-type="wlm" data-waveform-tab="recent">Recent</button>
+                    <button id="wlmFullWaveformTab" type="button" role="tab" aria-selected="false" aria-controls="wlmWaveformPanel" tabindex="-1" data-waveform-type="wlm" data-waveform-tab="full">Full</button>
+                  </div>
+                  <div id="wlmWaveformPanel" class="waveform-panel" role="tabpanel" aria-labelledby="wlmRecentWaveformTab">
+                    <div class="plot-well">
+                      <canvas id="wlmTrendChart"></canvas>
+                    </div>
+                    <p id="wlmFullWaveformStatus" class="waveform-status status-message" role="status" aria-live="polite" hidden></p>
+                  </div>
+                </section>
+                <div class="plot-well">
+                  <canvas id="wlmAdevChart"></canvas>
+                </div>
+              </div>
+            </section>
+          </section>
+        </section>
+
+        <section class="view" data-view="opm">
+          <div id="opmDriverOverlay" class="instrument-unavailable-overlay hidden" role="alert" aria-live="assertive" aria-hidden="true">
+            <section class="instrument-unavailable-card">
+              <div class="instrument-unavailable-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M12 3 2.8 19h18.4Z"></path>
+                  <path d="M12 8v5"></path>
+                  <path d="M12 17h.01"></path>
+                </svg>
+              </div>
+              <div class="instrument-unavailable-copy">
+                <span>Instrument unavailable</span>
+                <h2>TLPMX driver required</h2>
+                <p id="opmDriverErrorMessage">TLPMX driver unavailable.</p>
+                <small>The Optical Power Meter page is disabled until OpenUFC can load the driver.</small>
+              </div>
+              <div class="instrument-unavailable-actions">
+                <button class="button raised" type="button" data-return-home>Return to instruments</button>
+                <button id="opmRetryDriver" class="button raised" type="button">Check again</button>
+              </div>
+            </section>
+          </div>
+
+          <section id="opmDashboard" class="dashboard">
+            <aside class="control-panel raised">
+              <button class="section-title section-title-button" type="button" data-return-home>OPTICAL POWER METER</button>
+
+              <div class="resource-label-row">
+                <label class="field-label" for="opmResource">TLPMX resource</label>
+                <span id="opmResourceCount" class="resource-count-badge" aria-label="0 discovered instruments" aria-live="polite">0</span>
+              </div>
+              <div class="inline">
+                <input id="opmResource" class="inset-input" list="opmResourceList" autocomplete="off" />
+                <datalist id="opmResourceList"></datalist>
+                <button id="opmRefreshResources" class="instrument-icon-button" type="button" title="Refresh resources" aria-label="Refresh optical power meter resources">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5"></path>
+                    <path d="M4 13a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5"></path>
+                  </svg>
+                </button>
+                <button id="opmCheckConnection" class="instrument-icon-button" type="button" title="Check connection" aria-label="Check optical power meter connection">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M6.3 20.3a2.4 2.4 0 0 0 3.4 0L12 18l-6-6-2.3 2.3a2.4 2.4 0 0 0 0 3.4Z"></path>
+                    <path d="m2 22 3-3"></path>
+                    <path d="M7.5 13.5 10 11"></path>
+                    <path d="M10.5 16.5 13 14"></path>
+                    <path d="m18 3-4 4h6l-4 4"></path>
+                  </svg>
+                </button>
+              </div>
+
+              <div class="form-grid">
+                <label>
+                  <span>Wavelength (nm)</span>
+                  <input id="opmWavelength" class="inset-input" value="852" />
+                </label>
+                <label>
+                  <span>Display unit</span>
+                  <select id="opmDisplayUnit" class="inset-input">
+                    <option value="W">W</option>
+                    <option value="mW" selected>mW</option>
+                    <option value="dBm">dBm</option>
+                  </select>
+                </label>
+              </div>
+
+              <label class="check-row">
+                <input id="opmAutorange" type="checkbox" checked />
+                <span>Enable autorange</span>
+              </label>
+
+              <div class="dmm-tick-controls opm-tick-controls">
+                <section class="dmm-tick-slider" data-slider-select="opmManualRange">
+                  <div class="dmm-tick-header field-label">Manual range</div>
+                  <select id="opmManualRange" class="dmm-source-select" aria-label="Manual power range">
+                    <option value="1e-7">100 nW</option>
+                    <option value="1e-6">1 uW</option>
+                    <option value="1e-5">10 uW</option>
+                    <option value="1e-4">100 uW</option>
+                    <option value="1e-3">1 mW</option>
+                    <option value="1e-2">10 mW</option>
+                    <option value="1e-1">100 mW</option>
+                    <option value="1">1 W</option>
+                    <option value="10">10 W</option>
+                  </select>
+                  <div class="dmm-tick-body">
+                    <div class="dmm-tick-track" aria-hidden="true">
+                      <span class="dmm-tick-fill"></span>
+                      <span class="dmm-tick-knob"></span>
+                    </div>
+                    <div class="dmm-tick-options" data-slider-options></div>
+                  </div>
+                </section>
+
+              </div>
+
+              <label class="wide-label">
+                <span>Name Acquisition</span>
+                <input id="opmAcquisitionName" class="inset-input" placeholder="Optional" />
+              </label>
+
+              <div class="run-control">
+                <span>Stop</span>
+                <div class="toggle-cont">
+                  <input id="opmRunSwitch" class="toggle-input" type="checkbox" />
+                  <label class="toggle-label" for="opmRunSwitch" aria-label="Run optical power acquisition">
+                    <span class="cont-label-play"><span class="label-play"></span></span>
+                  </label>
+                </div>
+                <span>Run</span>
+              </div>
+
+              <div class="status-block">
+                <div id="opmStatusText" class="status-message" role="status" aria-live="polite">Offline</div>
+              </div>
+            </aside>
+
+            <section class="work-area">
+              <div id="opmNumberIndicators" class="metric-grid raised opm-metrics number-indicators">
+                <article class="metric-card">
+                  <div class="metric-accent blue"></div>
+                  <span>Latest</span>
+                  <strong id="opmValueMetric">--</strong>
+                  <em id="opmUnitMetric">mW</em>
+                </article>
+                <article class="metric-card">
+                  <div class="metric-accent green"></div>
+                  <span>Minimum</span>
+                  <strong id="opmMinMetric">--</strong>
+                  <em>min</em>
+                </article>
+                <article class="metric-card">
+                  <div class="metric-accent amber"></div>
+                  <span>Maximum</span>
+                  <strong id="opmMaxMetric">--</strong>
+                  <em>max</em>
+                </article>
+                <article class="metric-card">
+                  <div class="metric-accent red"></div>
+                  <span>Average</span>
+                  <strong id="opmAvgMetric">--</strong>
+                  <em>avg</em>
+                </article>
+                <article class="metric-card">
+                  <div class="metric-accent neutral"></div>
+                  <span title="Total acquired samples / total elapsed time">Sample rate</span>
+                  <strong id="opmSampleRateMetric">--</strong>
+                  <em>Sa/s</em>
+                </article>
+              </div>
+
+              <div class="plot-panel raised opm-plot-panel">
+                <section class="waveform-section">
+                  <div class="analysis-tabs waveform-tabs" role="tablist" aria-label="Optical power waveform view">
+                    <button id="opmRecentWaveformTab" type="button" role="tab" aria-selected="true" aria-controls="opmWaveformPanel" data-waveform-type="opm" data-waveform-tab="recent">Recent</button>
+                    <button id="opmFullWaveformTab" type="button" role="tab" aria-selected="false" aria-controls="opmWaveformPanel" tabindex="-1" data-waveform-type="opm" data-waveform-tab="full">Full</button>
+                  </div>
+                  <div id="opmWaveformPanel" class="waveform-panel" role="tabpanel" aria-labelledby="opmRecentWaveformTab">
+                    <div class="plot-well">
+                      <canvas id="opmTrendChart"></canvas>
+                    </div>
+                    <p id="opmFullWaveformStatus" class="waveform-status status-message" role="status" aria-live="polite" hidden></p>
+                  </div>
+                </section>
+                <div class="plot-well">
+                  <canvas id="opmAdevChart"></canvas>
+                </div>
+              </div>
+            </section>
+          </section>
+        </section>
+
+        <section class="view" data-view="devices">
+          <section class="library-layout">
+            <aside class="library-sidebar control-panel raised">
+              <button class="section-title section-title-button" type="button" data-return-home>DEVICES</button>
+              <button id="refreshDevices" class="button raised small" type="button">Refresh</button>
+              <div id="devicesList" class="library-list" aria-label="Identified USB instruments"></div>
+              <details id="unidentifiedDevices" class="devices-group" hidden>
+                <summary id="unidentifiedDevicesSummary">Unidentified</summary>
+                <div id="unidentifiedDevicesList" class="library-list" aria-label="Unidentified USB instruments"></div>
+              </details>
+              <details id="disconnectedDevices" class="devices-group" hidden>
+                <summary id="disconnectedDevicesSummary">Disconnected</summary>
+                <div id="disconnectedDevicesList" class="library-list" aria-label="Disconnected USB instruments"></div>
+              </details>
+            </aside>
+            <section class="library-detail devices-detail">
+              <div id="devicesStatus" class="devices-status status-message" role="status" aria-live="polite"></div>
+              <div id="devicesEmpty" class="library-empty raised">No USB instruments found.</div>
+              <section id="deviceDetail" class="library-metadata raised hidden" aria-labelledby="deviceName">
+                <h2 id="deviceName" class="device-name"></h2>
+                <div id="deviceMetadata" class="metadata-grid"></div>
+              </section>
+            </section>
+          </section>
+        </section>
+
+        <section class="view" data-view="library">
+          <section class="library-layout">
+            <aside class="library-sidebar control-panel raised">
+              <button class="section-title section-title-button" type="button" data-return-home>LIBRARY</button>
+              <div class="inline library-actions">
+                <button id="refreshLibrary" class="button raised small" type="button">Refresh</button>
+                <button id="showLibraryInExplorer" class="icon-button" type="button" title="Show in Explorer" aria-label="Show in Explorer">
+                  <img src="../node_modules/lucide-static/icons/folder-open.svg" alt="" />
+                </button>
+              </div>
+              <div id="libraryScanStatus" class="status-message" role="status" aria-live="polite" hidden></div>
+              <div id="libraryList" class="library-list"></div>
+            </aside>
+
+            <section class="library-detail">
+              <div id="libraryEmpty" class="library-empty raised">No library files in the current folder.</div>
+
+              <div id="libraryDetail" class="library-detail-content hidden">
+                <div class="library-toolbar raised">
+                  <label class="wide-label">
+                    <span>Name Acquisition</span>
+                    <div class="inline">
+                      <input id="libraryDisplayName" class="inset-input" />
+                      <button id="renameLibraryItem" class="button raised small" type="button">Save</button>
+                    </div>
+                  </label>
+                  <button id="deleteLibraryItem" class="button raised danger" type="button">Delete</button>
+                </div>
+
+                <div class="library-metadata raised">
+                  <div id="libraryMetadata" class="metadata-grid"></div>
+                </div>
+
+                <div class="library-preview-grid">
+                  <article class="library-plot raised">
+                    <header>
+                      <h2>Waveform</h2>
+                      <button id="exportWaveformCsv" class="button raised small" type="button">Export CSV</button>
+                    </header>
+                    <div class="plot-well">
+                      <canvas id="libraryWaveformChart"></canvas>
+                    </div>
+                  </article>
+
+                  <article class="library-plot raised">
+                    <header>
+                      <h2>ADEV</h2>
+                      <button id="exportAdevCsv" class="button raised small" type="button">Export CSV</button>
+                    </header>
+                    <div class="plot-well">
+                      <canvas id="libraryAdevChart"></canvas>
+                    </div>
+                  </article>
+                </div>
+
+                <div id="libraryExportStatus" class="library-export-status status-message" role="status" aria-live="polite"></div>
+              </div>
+            </section>
+          </section>
+        </section>
+      </main>
+      <div class="home-actions">
+        <div id="addInstrumentMenu" class="add-instrument-menu" hidden>
+          <button class="add-instrument-option" type="button" data-add-instrument-type="ufc">
+            <img src="../node_modules/lucide-static/icons/activity.svg" alt="" />
+            <span>Universal Frequency Counter</span>
+          </button>
+          <button class="add-instrument-option" type="button" data-add-instrument-type="dmm">
+            <img src="../node_modules/lucide-static/icons/gauge.svg" alt="" />
+            <span>Digital Multimeter</span>
+          </button>
+          <button class="add-instrument-option" type="button" data-add-instrument-type="wlm">
+            <img src="../node_modules/lucide-static/icons/waves.svg" alt="" />
+            <span>Wavelength Meter</span>
+          </button>
+          <button class="add-instrument-option" type="button" data-add-instrument-type="opm">
+            <img src="../node_modules/lucide-static/icons/sun.svg" alt="" />
+            <span>Optical Power Meter</span>
+          </button>
+        </div>
+        <button id="addInstrument" class="home-action-button" type="button" aria-label="Add instrument" aria-expanded="false" aria-controls="addInstrumentMenu">
+          <img src="../node_modules/lucide-static/icons/plus.svg" alt="" />
+        </button>
+        <button id="openLibrary" class="home-action-button" type="button" aria-label="Open library">
+          <img src="../node_modules/lucide-static/icons/library.svg" alt="" />
+        </button>
+        <button id="openDevices" class="home-action-button" type="button" aria-label="Devices" title="Devices">
+          <img src="../node_modules/lucide-static/icons/usb.svg" alt="" />
+        </button>
+        <button id="openGlobalSettings" class="home-action-button" type="button" aria-label="Global settings">
+          <img src="../node_modules/lucide-static/icons/settings.svg" alt="" />
+        </button>
+        <button id="openAbout" class="home-action-button" type="button" aria-label="About">
+          <img src="../node_modules/lucide-static/icons/info.svg" alt="" />
+        </button>
+      </div>
+    </div>
+
+    <dialog id="errorDialog" class="modal error-dialog" role="alertdialog" aria-labelledby="errorDialogTitle" aria-describedby="errorContext errorMessage">
+      <form method="dialog" class="modal-form">
+        <header><h2 id="errorDialogTitle">Error</h2></header>
+        <p id="errorContext" class="error-context"></p>
+        <p id="errorMessage" class="error-message"></p>
+        <details id="errorDetails">
+          <summary>Technical details</summary>
+          <pre id="errorDetailsText"></pre>
+        </details>
+        <footer><button class="button primary" value="cancel" type="submit" autofocus>OK</button></footer>
+      </form>
+    </dialog>
+
+    <dialog id="globalSettingsDialog" class="modal">
+      <form method="dialog" class="modal-form">
+        <header>
+          <h2>Global Settings</h2>
+          <button class="icon-button" value="cancel" type="submit" aria-label="Close dialog">
+            <img src="../node_modules/lucide-static/icons/x.svg" alt="" />
+          </button>
+        </header>
+        <div>
+          <span id="colorModeLabel" class="field-label">Appearance</span>
+          <div class="theme-switch" role="group" aria-labelledby="colorModeLabel" aria-describedby="colorModeHelp">
+            <button class="theme-option" type="button" data-color-mode="light" aria-pressed="false">Light</button>
+            <button class="theme-option" type="button" data-color-mode="dark" aria-pressed="false">Dark</button>
+            <button class="theme-option" type="button" data-color-mode="auto" aria-pressed="true">Auto</button>
+          </div>
+          <p id="colorModeHelp" class="modal-copy">Auto follows the Windows app theme.</p>
+        </div>
+        <label>
+          <span>Library folder</span>
+          <div class="inline">
+            <input id="globalLibraryDir" class="inset-input" />
+            <button id="browseGlobalLibrary" class="button raised small" type="button">Browse</button>
+          </div>
+        </label>
+        <footer>
+          <button id="openResetConfig" class="button raised danger" type="button">Reset</button>
+          <button id="saveGlobalSettings" class="button raised primary" type="button">Save</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <dialog id="resetConfigDialog" class="modal reset-config-dialog" aria-labelledby="resetConfigDialogTitle" aria-describedby="resetConfigDialogCopy">
+      <form method="dialog" class="modal-form">
+        <header>
+          <h2 id="resetConfigDialogTitle">Reset Configuration</h2>
+          <button class="icon-button" value="cancel" type="submit" aria-label="Close dialog">
+            <img src="../node_modules/lucide-static/icons/x.svg" alt="" />
+          </button>
+        </header>
+        <p id="resetConfigDialogCopy" class="modal-copy">
+          This permanently deletes all saved platform and instrument settings, stops any running acquisition, then restarts OpenUFC. Library records are not deleted.
+        </p>
+        <div class="reset-confirm-slider">
+          <input
+            id="resetConfigSlider"
+            class="reset-confirm-range"
+            type="range"
+            min="0"
+            max="100"
+            step="1"
+            value="0"
+            aria-label="Slide fully right to reset configuration and restart OpenUFC"
+          />
+          <span id="resetConfigSliderLabel" class="reset-confirm-label">Slide to reset and restart</span>
+        </div>
+        <footer>
+          <button id="cancelResetConfig" class="button raised" value="cancel" type="button" autofocus>Cancel</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <dialog id="renameInstrumentDialog" class="modal rename-instrument-dialog">
+      <form id="renameInstrumentForm" method="dialog" class="modal-form">
+        <header>
+          <h2>Rename Instrument</h2>
+          <button class="icon-button" value="cancel" type="submit" aria-label="Close dialog">
+            <img src="../node_modules/lucide-static/icons/x.svg" alt="" />
+          </button>
+        </header>
+        <label>
+          <span>Display name</span>
+          <input id="renameInstrumentName" class="inset-input" maxlength="80" autocomplete="off" />
+        </label>
+        <footer>
+          <button class="button raised" value="cancel" type="button">Cancel</button>
+          <button id="saveRenameInstrument" class="button raised primary" type="submit">Save</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <dialog id="deleteLibraryDialog" class="modal library-delete-dialog" aria-labelledby="deleteLibraryDialogTitle" aria-describedby="deleteLibraryDialogCopy">
+      <form id="deleteLibraryForm" method="dialog" class="modal-form">
+        <header>
+          <h2 id="deleteLibraryDialogTitle">Delete Library Record</h2>
+          <button class="icon-button" value="cancel" type="submit" aria-label="Close dialog">
+            <img src="../node_modules/lucide-static/icons/x.svg" alt="" />
+          </button>
+        </header>
+        <p id="deleteLibraryDialogCopy" class="modal-copy">
+          Delete <strong id="deleteLibraryRecordName" class="library-delete-record-name"></strong> permanently? This action cannot be undone.
+        </p>
+        <footer>
+          <button id="cancelDeleteLibraryItem" class="button raised" value="cancel" type="button" autofocus>Cancel</button>
+          <button id="confirmDeleteLibraryItem" class="button raised danger" type="submit">Delete</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <dialog id="aboutDialog" class="modal about-dialog">
+      <form method="dialog" class="modal-form">
+        <header>
+          <h2>About</h2>
+          <button class="icon-button" value="cancel" type="submit" aria-label="Close dialog">
+            <img src="../node_modules/lucide-static/icons/x.svg" alt="" />
+          </button>
+        </header>
+        <dl class="about-details">
+          <div>
+            <dt>Version</dt>
+            <dd id="appVersion"></dd>
+          </div>
+          <div>
+            <dt>Author</dt>
+            <dd>Suyang Wei</dd>
+          </div>
+          <div>
+            <dt>Affiliation</dt>
+            <dd>School of Electronics, Peking University</dd>
+          </div>
+          <div>
+            <dt>Email</dt>
+            <dd>syw@stu.pku.edu.cn</dd>
+          </div>
+        </dl>
+
+        <div class="modal-section-divider" role="separator" aria-label="Supported Models">
+          <span>Supported Models</span>
+        </div>
+
+        <div class="about-model-list">
+          <article class="about-model" data-supported-instrument-type="ufc">
+            <span class="about-model-icon" aria-hidden="true">
+              <img src="../node_modules/lucide-static/icons/activity.svg" alt="" />
+            </span>
+            <div class="about-model-copy">
+              <strong>Keysight</strong>
+              <span class="about-model-numbers" aria-label="Supported models">
+                <span class="about-model-number">53220A</span>
+                <span class="about-model-number">53230A</span>
+              </span>
+              <span class="about-model-kind">Universal Frequency Counter</span>
+            </div>
+          </article>
+          <article class="about-model">
+            <span class="about-model-icon" aria-hidden="true">
+              <img src="../node_modules/lucide-static/icons/gauge.svg" alt="" />
+            </span>
+            <div class="about-model-copy">
+              <strong>Keysight</strong>
+              <span class="about-model-numbers" aria-label="Supported models">
+                <span class="about-model-number">34410A</span>
+                <span class="about-model-number">34411A</span>
+                <span class="about-model-number">34460A</span>
+                <span class="about-model-number">34461A</span>
+                <span class="about-model-number">34465A</span>
+                <span class="about-model-number">34470A</span>
+              </span>
+              <span class="about-model-kind">Digital Multimeter</span>
+            </div>
+          </article>
+          <article class="about-model" data-supported-instrument-type="wlm">
+            <span class="about-model-icon" aria-hidden="true">
+              <img src="../node_modules/lucide-static/icons/waves.svg" alt="" />
+            </span>
+            <div class="about-model-copy">
+              <strong>Bristol</strong>
+              <span class="about-model-numbers" aria-label="Supported models">
+                <span class="about-model-number">671</span>
+                <span class="about-model-number">771</span>
+              </span>
+              <span class="about-model-kind">Wavelength Meter</span>
+            </div>
+          </article>
+          <article class="about-model" data-supported-instrument-type="opm">
+            <span class="about-model-icon" aria-hidden="true">
+              <img src="../node_modules/lucide-static/icons/sun.svg" alt="" />
+            </span>
+            <div class="about-model-copy">
+              <strong>Thorlabs</strong>
+              <span class="about-model-numbers" aria-label="Supported model series">
+                <span class="about-model-number">PM Series</span>
+              </span>
+              <span class="about-model-kind">Optical Power Meter via TLPMX</span>
+            </div>
+          </article>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="runningAcquisitionsDialog" class="modal running-acquisitions-dialog">
+      <form method="dialog" class="modal-form">
+        <header>
+          <h2>Acquisition Running</h2>
+          <button class="icon-button" value="cancel" type="submit" aria-label="Close dialog">
+            <img src="../node_modules/lucide-static/icons/x.svg" alt="" />
+          </button>
+        </header>
+        <p class="modal-copy">Stop all running acquisitions before closing the app.</p>
+        <div id="runningAcquisitionShortcuts" class="running-acquisition-list"></div>
+        <footer>
+          <button class="button raised primary" value="cancel" type="submit">Stay Open</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <script src="../node_modules/chart.js/dist/chart.umd.js"></script>
+    <script src="renderer.js"></script>
+  </body>
+</html>

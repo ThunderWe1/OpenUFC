@@ -1,0 +1,235 @@
+{
+  "settle_s": 0.1,
+  "runs": [
+    {
+      "natural": false,
+      "rate": 50000,
+      "delay": 1.12,
+      "was_measuring": true,
+      "count": 50386,
+      "received": 50386,
+      "tail": [
+        413030846.2632132,
+        412988962.1057085,
+        413028552.3870926,
+        412974005.5366135
+      ],
+      "median": 413899960.70285743,
+      "minimum": 411694951.5614658,
+      "min_before_last": 411694951.5614658,
+      "error": "+0,\"No error\""
+    },
+    {
+      "natural": false,
+      "rate": 50000,
+      "delay": 1.23,
+      "was_measuring": true,
+      "count": 55807,
+      "received": 55807,
+      "tail": [
+        413483737.09381413,
+        413515524.6348446,
+        413463847.3764042,
+        413495531.9003892
+      ],
+      "median": 415026450.9696829,
+      "minimum": 412690036.412487,
+      "min_before_last": 412690036.412487,
+      "error": "+0,\"No error\""
+    },
+    {
+      "natural": false,
+      "rate": 50000,
+      "delay": 1.36,
+      "was_measuring": true,
+      "count": 61701,
+      "received": 61701,
+      "tail": [
+        416189669.7713802,
+        416204860.17329603,
+        416248817.31566674,
+        416229065.8380807
+      ],
+      "median": 416369088.55144787,
+      "minimum": 414558922.86248803,
+      "min_before_last": 414558922.86248803,
+      "error": "+0,\"No error\""
+    },
+    {
+      "natural": false,
+      "rate": 50000,
+      "delay": 1.49,
+      "was_measuring": true,
+      "count": 68607,
+      "received": 68607,
+      "tail": [
+        416645255.768885,
+        416577574.6197139,
+        416622422.3385995,
+        416624045.9665408
+      ],
+      "median": 416510625.4077166,
+      "minimum": 414445318.32646906,
+      "min_before_last": 414445318.32646906,
+      "error": "+0,\"No error\""
+    },
+    {
+      "natural": false,
+      "rate": 50000,
+      "delay": 1.62,
+      "was_measuring": true,
+      "count": 76322,
+      "received": 76322,
+      "tail": [
+        416395543.35992956,
+        416454850.8337547,
+        416450186.72809863,
+        416444914.3866342
+      ],
+      "median": 416897198.4484164,
+      "minimum": 414903934.78315705,
+      "min_before_last": 414903934.78315705,
+      "error": "+0,\"No error\""
+    },
+    {
+      "natural": false,
+      "rate": 50000,
+      "delay": 1.75,
+      "was_measuring": true,
+      "count": 81297,
+      "received": 81297,
+      "tail": [
+        417228711.26646334,
+        417275531.5995741,
+        417162061.3125869,
+        417277669.30037445
+      ],
+      "median": 417272681.365911,
+      "minimum": 415322015.52714044,
+      "min_before_last": 415322015.52714044,
+      "error": "+0,\"No error\""
+    },
+    {
+      "natural": true,
+      "rate": 50000,
+      "delay": 0.1,
+      "was_measuring": false,
+      "count": 5000,
+      "received": 5000,
+      "tail": [
+        418323998.73707205,
+        418353055.92806584,
+        418331774.2095242,
+        418243703.1994554
+      ],
+      "median": 418310750.40725064,
+      "minimum": 417366454.1228395,
+      "min_before_last": 417366454.1228395,
+      "error": "+0,\"No error\""
+    },
+    {
+      "natural": true,
+      "rate": 50000,
+      "delay": 0.1,
+      "was_measuring": false,
+      "count": 5000,
+      "received": 5000,
+      "tail": [
+        418930841.8246637,
+        418835646.9623763,
+        418953005.45805645,
+        418868775.61010605
+      ],
+      "median": 418731269.5872197,
+      "minimum": 418117542.95478046,
+      "min_before_last": 418117542.95478046,
+      "error": "+0,\"No error\""
+    },
+    {
+      "natural": true,
+      "rate": 50000,
+      "delay": 0.1,
+      "was_measuring": false,
+      "count": 5000,
+      "received": 5000,
+      "tail": [
+        419217996.21525097,
+        419241360.25937396,
+        419225614.63915205,
+        419162542.4334898
+      ],
+      "median": 418948685.1845505,
+      "minimum": 418272318.0256555,
+      "min_before_last": 418272318.0256555,
+      "error": "+0,\"No error\""
+    },
+    {
+      "natural": false,
+      "rate": 1000,
+      "delay": 1.23,
+      "was_measuring": true,
+      "count": 1125,
+      "received": 1125,
+      "tail": [
+        417899098.6120445,
+        418214400.12201464,
+        418198469.93392664,
+        418329666.3940323
+      ],
+      "median": 417728591.4536072,
+      "minimum": 415774417.6604622,
+      "min_before_last": 415774417.6604622,
+      "error": "+0,\"No error\""
+    },
+    {
+      "natural": false,
+      "rate": 1000,
+      "delay": 1.49,
+      "was_measuring": true,
+      "count": 1384,
+      "received": 1384,
+      "tail": [
+        419731538.01532835,
+        419740808.3464381,
+        419678501.65750635,
+        419717560.00192577
+      ],
+      "median": 418871698.24217933,
+      "minimum": 416925650.8307082,
+      "min_before_last": 416925650.8307082,
+      "error": "+0,\"No error\""
+    },
+    {
+      "natural": false,
+      "rate": 1000,
+      "delay": 1.75,
+      "was_measuring": true,
+      "count": 1631,
+      "received": 1631,
+      "tail": [
+        420426318.5001558,
+        420522287.75609714,
+        420611788.79740614,
+        420734738.508115
+      ],
+      "median": 420571131.42382324,
+      "minimum": 418253722.9646221,
+      "min_before_last": 418253722.9646221,
+      "error": "+0,\"No error\""
+    }
+  ],
+  "identity": "Agilent Technologies,53230A,MY59220164,03.01-1909.4210-1.19-4.16-127-159-35",
+  "original": {
+    "FORM:DATA": "REAL,64",
+    "FORM:BORD": "NORM",
+    "SENS:FREQ:GATE:TIME": "+2.00000000000000E-005",
+    "SAMP:COUN": "+1000000"
+  },
+  "restored": {
+    "FORM:DATA": "REAL,64",
+    "FORM:BORD": "NORM",
+    "SENS:FREQ:GATE:TIME": "+2.00000000000000E-005",
+    "SAMP:COUN": "+1000000"
+  },
+  "restore_error": "+0,\"No error\""
+}

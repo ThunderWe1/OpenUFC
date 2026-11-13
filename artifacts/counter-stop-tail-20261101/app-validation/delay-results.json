@@ -1,0 +1,99 @@
+{
+  "original": {
+    "FORM:DATA": "REAL,64",
+    "FORM:BORD": "NORM",
+    "SENS:FREQ:MODE": "CONT",
+    "SENS:FREQ:GATE:SOUR": "TIME",
+    "SENS:FREQ:GATE:TIME": "+2.00000000000000E-005",
+    "SAMP:COUN": "+1000000",
+    "TRIG:SOUR": "IMM",
+    "TRIG:COUN": "+1"
+  },
+  "runs": [
+    {
+      "file": "ufc_20261101_215850.lmp",
+      "requested_stop_s": 0.7,
+      "stop_wall_s": 0.3838386999996146,
+      "count": 15672,
+      "tail": [
+        462372423.74518496,
+        462425341.6486426,
+        462311784.8563913
+      ],
+      "median_hz": 462124700.40367806,
+      "minimum_hz": 460193401.6421331,
+      "stop_drain": {
+        "complete": true,
+        "saved_samples": 15672,
+        "error": null
+      }
+    },
+    {
+      "file": "ufc_20261101_215851.lmp",
+      "requested_stop_s": 1.17,
+      "stop_wall_s": 0.22292379999998957,
+      "count": 37375,
+      "tail": [
+        463027869.4460554,
+        462922935.65020835,
+        463128873.3899445
+      ],
+      "median_hz": 462849374.08407927,
+      "minimum_hz": 460851755.81242037,
+      "stop_drain": {
+        "complete": true,
+        "saved_samples": 4263,
+        "error": null
+      }
+    },
+    {
+      "file": "ufc_20261101_215852.lmp",
+      "requested_stop_s": 1.43,
+      "stop_wall_s": 0.25134439999237657,
+      "count": 51205,
+      "tail": [
+        463340085.87995374,
+        463240144.32337606,
+        463206165.0143982
+      ],
+      "median_hz": 463907124.0762773,
+      "minimum_hz": 461394394.5990344,
+      "stop_drain": {
+        "complete": true,
+        "saved_samples": 18276,
+        "error": null
+      }
+    },
+    {
+      "file": "ufc_20261101_215854.lmp",
+      "requested_stop_s": 2.13,
+      "stop_wall_s": 0.2228464000072563,
+      "count": 87410,
+      "tail": [
+        464550564.84947455,
+        464580327.84489125,
+        464505644.660407
+      ],
+      "median_hz": 464731181.8786115,
+      "minimum_hz": 462460440.0739414,
+      "stop_drain": {
+        "complete": true,
+        "saved_samples": 23960,
+        "error": null
+      }
+    }
+  ],
+  "restored": {
+    "FORM:DATA": "REAL,64",
+    "FORM:BORD": "NORM",
+    "SENS:FREQ:MODE": "CONT",
+    "SENS:FREQ:GATE:SOUR": "TIME",
+    "SENS:FREQ:GATE:TIME": "+2.00000000000000E-005",
+    "SAMP:COUN": "+1000000",
+    "TRIG:SOUR": "IMM",
+    "TRIG:COUN": "+1"
+  },
+  "configuration_restored": true,
+  "restore_error": "+0,\"No error\"",
+  "remaining_readings": 0
+}

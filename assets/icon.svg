@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#f3f3f3"/>
+      <stop offset="0.55" stop-color="#e0e0e0"/>
+      <stop offset="1" stop-color="#d7d7d7"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#c6c6c6"/>
+    </linearGradient>
+    <filter id="shadow" x="-15%" y="-15%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#27313f" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+  <rect x="12" y="10" width="232" height="232" rx="48" fill="url(#tile)" stroke="url(#rim)" stroke-width="3" filter="url(#shadow)"/>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M66 90 A72 72 0 0 1 190 90 M190 162 A72 72 0 0 1 66 162" stroke="#ffffff" stroke-opacity="0.75" stroke-width="14" transform="translate(-1 -2)"/>
+    <path d="M66 90 A72 72 0 0 1 190 90 M190 162 A72 72 0 0 1 66 162" stroke="#27313f" stroke-width="14"/>
+    <path d="M48 126 C68 126 72 90 88 90 C106 90 109 162 128 162 C147 162 150 90 168 90 C184 90 188 126 208 126" stroke="#4d7cff" stroke-width="14"/>
+  </g>
+</svg>

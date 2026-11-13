@@ -1,0 +1,198 @@
+{
+  "runs": [
+    {
+      "natural": false,
+      "rate": 50000,
+      "delay": 1.12,
+      "was_measuring": false,
+      "count": 1,
+      "received": 1,
+      "tail": [
+        9.91e+37
+      ],
+      "median": 9.91e+37,
+      "minimum": 9.91e+37,
+      "min_before_last": null,
+      "error": "+316,\"Channel 3 power too low for operation\""
+    },
+    {
+      "natural": false,
+      "rate": 50000,
+      "delay": 1.23,
+      "was_measuring": false,
+      "count": 1,
+      "received": 1,
+      "tail": [
+        9.91e+37
+      ],
+      "median": 9.91e+37,
+      "minimum": 9.91e+37,
+      "min_before_last": null,
+      "error": "+316,\"Channel 3 power too low for operation\""
+    },
+    {
+      "natural": false,
+      "rate": 50000,
+      "delay": 1.36,
+      "was_measuring": false,
+      "count": 1,
+      "received": 1,
+      "tail": [
+        9.91e+37
+      ],
+      "median": 9.91e+37,
+      "minimum": 9.91e+37,
+      "min_before_last": null,
+      "error": "+316,\"Channel 3 power too low for operation\""
+    },
+    {
+      "natural": false,
+      "rate": 50000,
+      "delay": 1.49,
+      "was_measuring": false,
+      "count": 1,
+      "received": 1,
+      "tail": [
+        9.91e+37
+      ],
+      "median": 9.91e+37,
+      "minimum": 9.91e+37,
+      "min_before_last": null,
+      "error": "+316,\"Channel 3 power too low for operation\""
+    },
+    {
+      "natural": false,
+      "rate": 50000,
+      "delay": 1.62,
+      "was_measuring": false,
+      "count": 1,
+      "received": 1,
+      "tail": [
+        9.91e+37
+      ],
+      "median": 9.91e+37,
+      "minimum": 9.91e+37,
+      "min_before_last": null,
+      "error": "+316,\"Channel 3 power too low for operation\""
+    },
+    {
+      "natural": false,
+      "rate": 50000,
+      "delay": 1.75,
+      "was_measuring": false,
+      "count": 1,
+      "received": 1,
+      "tail": [
+        9.91e+37
+      ],
+      "median": 9.91e+37,
+      "minimum": 9.91e+37,
+      "min_before_last": null,
+      "error": "+316,\"Channel 3 power too low for operation\""
+    },
+    {
+      "natural": true,
+      "rate": 50000,
+      "delay": 0.1,
+      "was_measuring": false,
+      "count": 1,
+      "received": 1,
+      "tail": [
+        9.91e+37
+      ],
+      "median": 9.91e+37,
+      "minimum": 9.91e+37,
+      "min_before_last": null,
+      "error": "+316,\"Channel 3 power too low for operation\""
+    },
+    {
+      "natural": true,
+      "rate": 50000,
+      "delay": 0.1,
+      "was_measuring": false,
+      "count": 1,
+      "received": 1,
+      "tail": [
+        9.91e+37
+      ],
+      "median": 9.91e+37,
+      "minimum": 9.91e+37,
+      "min_before_last": null,
+      "error": "+316,\"Channel 3 power too low for operation\""
+    },
+    {
+      "natural": true,
+      "rate": 50000,
+      "delay": 0.1,
+      "was_measuring": false,
+      "count": 1,
+      "received": 1,
+      "tail": [
+        9.91e+37
+      ],
+      "median": 9.91e+37,
+      "minimum": 9.91e+37,
+      "min_before_last": null,
+      "error": "+316,\"Channel 3 power too low for operation\""
+    },
+    {
+      "natural": false,
+      "rate": 1000,
+      "delay": 1.23,
+      "was_measuring": false,
+      "count": 1,
+      "received": 1,
+      "tail": [
+        9.91e+37
+      ],
+      "median": 9.91e+37,
+      "minimum": 9.91e+37,
+      "min_before_last": null,
+      "error": "+316,\"Channel 3 power too low for operation\""
+    },
+    {
+      "natural": false,
+      "rate": 1000,
+      "delay": 1.49,
+      "was_measuring": false,
+      "count": 1,
+      "received": 1,
+      "tail": [
+        9.91e+37
+      ],
+      "median": 9.91e+37,
+      "minimum": 9.91e+37,
+      "min_before_last": null,
+      "error": "+316,\"Channel 3 power too low for operation\""
+    },
+    {
+      "natural": false,
+      "rate": 1000,
+      "delay": 1.75,
+      "was_measuring": false,
+      "count": 1,
+      "received": 1,
+      "tail": [
+        9.91e+37
+      ],
+      "median": 9.91e+37,
+      "minimum": 9.91e+37,
+      "min_before_last": null,
+      "error": "+316,\"Channel 3 power too low for operation\""
+    }
+  ],
+  "identity": "Agilent Technologies,53230A,MY59220164,03.01-1909.4210-1.19-4.16-127-159-35",
+  "original": {
+    "FORM:DATA": "REAL,64",
+    "FORM:BORD": "NORM",
+    "SENS:FREQ:GATE:TIME": "+2.00000000000000E-005",
+    "SAMP:COUN": "+1000000"
+  },
+  "restored": {
+    "FORM:DATA": "REAL,64",
+    "FORM:BORD": "NORM",
+    "SENS:FREQ:GATE:TIME": "+2.00000000000000E-005",
+    "SAMP:COUN": "+1000000"
+  },
+  "restore_error": "+0,\"No error\""
+}

@@ -1,0 +1,242 @@
+[
+  {
+    "start": 14099.9226349,
+    "end": 14099.9336623,
+    "requested": 5000,
+    "received": 4909
+  },
+  {
+    "start": 14100.9027862,
+    "end": 14100.9126957,
+    "requested": 5000,
+    "received": 4935
+  },
+  {
+    "start": 14101.8951066,
+    "end": 14101.9113359,
+    "requested": 5000,
+    "received": 4890
+  },
+  {
+    "start": 14102.8729905,
+    "end": 14102.8838179,
+    "requested": 5000,
+    "received": 4935
+  },
+  {
+    "start": 14103.8572607,
+    "end": 14103.8648367,
+    "requested": 5000,
+    "received": 4373
+  },
+  {
+    "start": 14104.730989,
+    "end": 14104.7411768,
+    "requested": 5000,
+    "received": 4328
+  },
+  {
+    "start": 14105.5944256,
+    "end": 14105.6038439,
+    "requested": 5000,
+    "received": 4422
+  },
+  {
+    "start": 14106.477123,
+    "end": 14106.487061,
+    "requested": 5000,
+    "received": 4369
+  },
+  {
+    "start": 14107.3546486,
+    "end": 14107.363956,
+    "requested": 5000,
+    "received": 4355
+  },
+  {
+    "start": 14108.2320746,
+    "end": 14108.2419067,
+    "requested": 5000,
+    "received": 4389
+  },
+  {
+    "start": 14109.0993003,
+    "end": 14109.1084772,
+    "requested": 5000,
+    "received": 4455
+  },
+  {
+    "start": 14109.991832,
+    "end": 14110.0009849,
+    "requested": 5000,
+    "received": 4410
+  },
+  {
+    "start": 14110.8825828,
+    "end": 14110.8922686,
+    "requested": 5000,
+    "received": 4404
+  },
+  {
+    "start": 14111.7521966,
+    "end": 14111.761077,
+    "requested": 5000,
+    "received": 4395
+  },
+  {
+    "start": 14112.6446503,
+    "end": 14112.6535343,
+    "requested": 5000,
+    "received": 4439
+  },
+  {
+    "start": 14113.5209534,
+    "end": 14113.529139,
+    "requested": 5000,
+    "received": 4377
+  },
+  {
+    "start": 14114.3960455,
+    "end": 14114.4181303,
+    "requested": 5000,
+    "received": 4350
+  },
+  {
+    "start": 14115.2739981,
+    "end": 14115.2816505,
+    "requested": 5000,
+    "received": 4359
+  },
+  {
+    "start": 14116.1434372,
+    "end": 14116.1557899,
+    "requested": 5000,
+    "received": 4353
+  },
+  {
+    "start": 14117.0104153,
+    "end": 14117.0200378,
+    "requested": 5000,
+    "received": 4433
+  },
+  {
+    "start": 14117.9011955,
+    "end": 14117.9094902,
+    "requested": 5000,
+    "received": 4366
+  },
+  {
+    "start": 14118.7833663,
+    "end": 14118.8010701,
+    "requested": 5000,
+    "received": 4344
+  },
+  {
+    "start": 14119.6424021,
+    "end": 14119.6507035,
+    "requested": 5000,
+    "received": 4375
+  },
+  {
+    "start": 14120.5155218,
+    "end": 14120.5238878,
+    "requested": 5000,
+    "received": 4415
+  },
+  {
+    "start": 14121.3975207,
+    "end": 14121.4054757,
+    "requested": 5000,
+    "received": 4375
+  },
+  {
+    "start": 14122.2836546,
+    "end": 14122.2917988,
+    "requested": 5000,
+    "received": 4360
+  },
+  {
+    "start": 14123.1492849,
+    "end": 14123.16634,
+    "requested": 5000,
+    "received": 4341
+  },
+  {
+    "start": 14124.014362,
+    "end": 14124.0235814,
+    "requested": 5000,
+    "received": 4354
+  },
+  {
+    "start": 14124.8868133,
+    "end": 14124.895111,
+    "requested": 5000,
+    "received": 4417
+  },
+  {
+    "start": 14125.7793937,
+    "end": 14125.7883196,
+    "requested": 5000,
+    "received": 4379
+  },
+  {
+    "start": 14126.6414636,
+    "end": 14126.6509134,
+    "requested": 5000,
+    "received": 4387
+  },
+  {
+    "start": 14127.5272683,
+    "end": 14127.5452205,
+    "requested": 5000,
+    "received": 4366
+  },
+  {
+    "start": 14128.4070231,
+    "end": 14128.414891,
+    "requested": 5000,
+    "received": 4397
+  },
+  {
+    "start": 14129.2741669,
+    "end": 14129.2818847,
+    "requested": 5000,
+    "received": 4441
+  },
+  {
+    "start": 14130.1756052,
+    "end": 14130.1894659,
+    "requested": 5000,
+    "received": 4369
+  },
+  {
+    "start": 14131.0338645,
+    "end": 14131.0423263,
+    "requested": 5000,
+    "received": 4391
+  },
+  {
+    "start": 14131.9132609,
+    "end": 14131.9274738,
+    "requested": 5000,
+    "received": 4400
+  },
+  {
+    "start": 14132.7873928,
+    "end": 14132.7967106,
+    "requested": 5000,
+    "received": 4464
+  },
+  {
+    "start": 14133.6873193,
+    "end": 14133.6965041,
+    "requested": 5000,
+    "received": 4366
+  },
+  {
+    "start": 14133.9525146,
+    "end": 14133.9562203,
+    "requested": 1475,
+    "received": 1475
+  }
+]

@@ -1,0 +1,343 @@
+{
+  "settle_s": 0,
+  "runs": [
+    {
+      "natural": false,
+      "rate": 50000,
+      "delay": 1.12,
+      "was_measuring": true,
+      "count": 50575,
+      "received": 50575,
+      "tail": [
+        483024155.0899659,
+        483010291.2134408,
+        483179414.3568276,
+        483060110.8847941
+      ],
+      "median": 482793507.3545663,
+      "minimum": 480392725.1403022,
+      "min_before_last": 480392725.1403022,
+      "error": "+0,\"No error\"",
+      "completed_before_abort": 49563,
+      "saved_tail": [
+        483800272.0939933,
+        483848250.6456416,
+        483835046.75367904,
+        483864756.524072
+      ],
+      "saved_minimum": 480392725.1403022,
+      "discarded_count": 1012
+    },
+    {
+      "natural": false,
+      "rate": 50000,
+      "delay": 1.23,
+      "was_measuring": true,
+      "count": 55807,
+      "received": 55807,
+      "tail": [
+        483517545.26081216,
+        483513660.06987756,
+        483575124.04493016,
+        483605037.4550579
+      ],
+      "median": 483383836.4167478,
+      "minimum": 480690425.4592936,
+      "min_before_last": 480690425.4592936,
+      "error": "+0,\"No error\"",
+      "completed_before_abort": 54726,
+      "saved_tail": [
+        483821961.46461743,
+        483905200.68603617,
+        483965820.63143116,
+        483931263.0426873
+      ],
+      "saved_minimum": 480690425.4592936,
+      "discarded_count": 1081
+    },
+    {
+      "natural": false,
+      "rate": 50000,
+      "delay": 1.36,
+      "was_measuring": true,
+      "count": 63383,
+      "received": 63383,
+      "tail": [
+        485057805.38142467,
+        485130684.7831823,
+        485068587.7824928,
+        485098923.2622837
+      ],
+      "median": 484040967.9840426,
+      "minimum": 481697543.2401809,
+      "min_before_last": 481697543.2401809,
+      "error": "+0,\"No error\"",
+      "completed_before_abort": 60362,
+      "saved_tail": [
+        485019063.7861339,
+        485131869.9950504,
+        485048682.1856909,
+        484994660.9430152
+      ],
+      "saved_minimum": 481697543.2401809,
+      "discarded_count": 3021
+    },
+    {
+      "natural": false,
+      "rate": 50000,
+      "delay": 1.49,
+      "was_measuring": true,
+      "count": 69332,
+      "received": 69332,
+      "tail": [
+        486305338.2283685,
+        486293309.8758835,
+        486349764.92475533,
+        3.5309450733925236
+      ],
+      "median": 485042817.45537645,
+      "minimum": 3.5309450733925236,
+      "min_before_last": 482478777.638636,
+      "error": "+0,\"No error\"",
+      "completed_before_abort": 65613,
+      "saved_tail": [
+        485940465.2569617,
+        485885175.19107616,
+        485856167.80227333,
+        486036926.005048
+      ],
+      "saved_minimum": 482478777.638636,
+      "discarded_count": 3719
+    },
+    {
+      "natural": false,
+      "rate": 50000,
+      "delay": 1.62,
+      "was_measuring": true,
+      "count": 76068,
+      "received": 76068,
+      "tail": [
+        486257823.74893475,
+        486259133.5474687,
+        486215318.66318876,
+        486280329.4501744
+      ],
+      "median": 486182760.26996946,
+      "minimum": 483328067.79354084,
+      "min_before_last": 483328067.79354084,
+      "error": "+0,\"No error\"",
+      "completed_before_abort": 71218,
+      "saved_tail": [
+        486594435.7794062,
+        486573689.3936368,
+        486470103.17158175,
+        486516943.9513714
+      ],
+      "saved_minimum": 483328067.79354084,
+      "discarded_count": 4850
+    },
+    {
+      "natural": false,
+      "rate": 50000,
+      "delay": 1.75,
+      "was_measuring": true,
+      "count": 80879,
+      "received": 80879,
+      "tail": [
+        487843121.60965234,
+        487799690.4490921,
+        487819862.43072456,
+        3.5665351815061985
+      ],
+      "median": 486226801.5641487,
+      "minimum": 3.5665351815061985,
+      "min_before_last": 483534102.46073186,
+      "error": "+0,\"No error\"",
+      "completed_before_abort": 76239,
+      "saved_tail": [
+        487251414.8721142,
+        487091052.9698346,
+        487152463.2467882,
+        487119212.21513486
+      ],
+      "saved_minimum": 483534102.46073186,
+      "discarded_count": 4640
+    },
+    {
+      "natural": true,
+      "rate": 50000,
+      "delay": 0.1,
+      "was_measuring": false,
+      "count": 5000,
+      "received": 5000,
+      "tail": [
+        487335907.60122377,
+        487303976.2667201,
+        487286995.7632889,
+        487164579.83684975
+      ],
+      "median": 486027944.3821118,
+      "minimum": 484187908.93738335,
+      "min_before_last": 484187908.93738335,
+      "error": "+0,\"No error\"",
+      "completed_before_abort": 5000,
+      "saved_tail": [
+        487335907.60122377,
+        487303976.2667201,
+        487286995.7632889,
+        487164579.83684975
+      ],
+      "saved_minimum": 484187908.93738335,
+      "discarded_count": 0
+    },
+    {
+      "natural": true,
+      "rate": 50000,
+      "delay": 0.1,
+      "was_measuring": false,
+      "count": 5000,
+      "received": 5000,
+      "tail": [
+        485713083.6778123,
+        485832156.10899913,
+        485766314.43604124,
+        485854384.6741622
+      ],
+      "median": 486114324.48523915,
+      "minimum": 484512202.5905999,
+      "min_before_last": 484512202.5905999,
+      "error": "+0,\"No error\"",
+      "completed_before_abort": 5000,
+      "saved_tail": [
+        485713083.6778123,
+        485832156.10899913,
+        485766314.43604124,
+        485854384.6741622
+      ],
+      "saved_minimum": 484512202.5905999,
+      "discarded_count": 0
+    },
+    {
+      "natural": true,
+      "rate": 50000,
+      "delay": 0.1,
+      "was_measuring": false,
+      "count": 5000,
+      "received": 5000,
+      "tail": [
+        486122962.78304327,
+        486214069.7932659,
+        486228334.137086,
+        486161852.9311871
+      ],
+      "median": 486618924.472098,
+      "minimum": 484722948.6910509,
+      "min_before_last": 484722948.6910509,
+      "error": "+0,\"No error\"",
+      "completed_before_abort": 5000,
+      "saved_tail": [
+        486122962.78304327,
+        486214069.7932659,
+        486228334.137086,
+        486161852.9311871
+      ],
+      "saved_minimum": 484722948.6910509,
+      "discarded_count": 0
+    },
+    {
+      "natural": false,
+      "rate": 1000,
+      "delay": 1.23,
+      "was_measuring": true,
+      "count": 1157,
+      "received": 1157,
+      "tail": [
+        487840734.36197424,
+        487661624.3194959,
+        487629920.22100085,
+        487644430.55548155
+      ],
+      "median": 487462385.6884065,
+      "minimum": 482665597.51181,
+      "min_before_last": 482665597.51181,
+      "error": "+0,\"No error\"",
+      "completed_before_abort": 1088,
+      "saved_tail": [
+        486555495.164952,
+        486553332.2319523,
+        486420913.01139367,
+        486505369.1175573
+      ],
+      "saved_minimum": 482665597.51181,
+      "discarded_count": 69
+    },
+    {
+      "natural": false,
+      "rate": 1000,
+      "delay": 1.49,
+      "was_measuring": true,
+      "count": 1361,
+      "received": 1361,
+      "tail": [
+        487946524.3389872,
+        487888573.79229856,
+        488417625.535277,
+        489054254.3050975
+      ],
+      "median": 487883583.14761007,
+      "minimum": 484465053.2183781,
+      "min_before_last": 484465053.2183781,
+      "error": "+0,\"No error\"",
+      "completed_before_abort": 1305,
+      "saved_tail": [
+        485800573.09421444,
+        485750925.1172275,
+        485908734.99759066,
+        485731236.2319085
+      ],
+      "saved_minimum": 484465053.2183781,
+      "discarded_count": 56
+    },
+    {
+      "natural": false,
+      "rate": 1000,
+      "delay": 1.75,
+      "was_measuring": true,
+      "count": 1613,
+      "received": 1613,
+      "tail": [
+        489959673.9064231,
+        489793875.9682725,
+        489836228.3224421,
+        489852455.7312415
+      ],
+      "median": 488662122.3877456,
+      "minimum": 484894500.5248499,
+      "min_before_last": 484894500.5248499,
+      "error": "+0,\"No error\"",
+      "completed_before_abort": 1510,
+      "saved_tail": [
+        487409093.3794985,
+        487255466.86875415,
+        487057796.93268573,
+        486971282.15318877
+      ],
+      "saved_minimum": 484894500.5248499,
+      "discarded_count": 103
+    }
+  ],
+  "identity": "Agilent Technologies,53230A,MY59220164,03.01-1909.4210-1.19-4.16-127-159-35",
+  "original": {
+    "FORM:DATA": "REAL,64",
+    "FORM:BORD": "NORM",
+    "SENS:FREQ:GATE:TIME": "+2.00000000000000E-005",
+    "SAMP:COUN": "+1000000"
+  },
+  "restored": {
+    "FORM:DATA": "REAL,64",
+    "FORM:BORD": "NORM",
+    "SENS:FREQ:GATE:TIME": "+2.00000000000000E-005",
+    "SAMP:COUN": "+1000000"
+  },
+  "restore_error": "+0,\"No error\""
+}

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Starting OpenUFC</title>
+    <style>
+      @font-face { font-family: Utendo; src: url('../assets/fonts/Utendo-Regular.ttf'); }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; height: 100vh; display: grid; place-content: center;
+        background: #232a33; color: #e4eaf2; font: 15px Utendo, 'Segoe UI', sans-serif;
+        border: 1px solid #424e5e; -webkit-app-region: drag;
+      }
+      main { width: 360px; }
+      header { display: flex; gap: 20px; align-items: center; }
+      img { width: 72px; height: 72px; }
+      h1 { font-size: 32px; font-weight: 600; margin: 0 0 6px; }
+      p { margin: 0; color: #a9b5c5; }
+      .waiting { display: flex; align-items: center; gap: 12px; margin-top: 30px; }
+      .spinner {
+        width: 19px; height: 19px; border: 2px solid #424e5e; border-top-color: #8aafff;
+        border-radius: 50%; animation: spin 1s linear infinite;
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      @media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <img src="../assets/icon.svg" alt="" />
+        <div><h1>OpenUFC</h1><p>Laser measurement platform</p></div>
+      </header>
+      <div class="waiting" role="status" aria-live="polite">
+        <span class="spinner" aria-hidden="true"></span><p id="startupStatus">Starting OpenUFC. Please wait…</p>
+      </div>
+    </main>
+  </body>
+</html>
