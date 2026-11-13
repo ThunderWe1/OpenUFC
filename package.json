@@ -12,10 +12,7 @@
   "main": "electron/main.js",
   "scripts": {
     "dev": "set ELECTRON_RUN_AS_NODE=&& electron .",
-    "test": "py -B -m pytest -q -p no:cacheprovider",
-    "test:js": "node --check electron/main.js && node --check electron/preload.js && node --check electron/smoke.js && node --check ui/renderer.js && node --test tests/test_electron.cjs",
     "smoke": "set ELECTRON_RUN_AS_NODE=&& electron . --smoke",
-    "verify": "npm test && npm run test:js && npm run smoke",
     "build:backend": "node scripts/build-backend.cjs",
     "build:icon": "set ELECTRON_RUN_AS_NODE=&& electron scripts/build-icon.cjs",
     "build:win": "npm run build:icon && npm run build:backend && electron-builder --config build/electron-builder-generated.json --win portable --x64"

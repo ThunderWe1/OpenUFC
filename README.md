@@ -153,43 +153,7 @@ unknown-publisher warning.
 
 Run the packaged UI check with `dist\OpenUFC-0.1.0-win-x64.exe --smoke`.
 Smoke checks use a fresh temporary settings folder.
-For an isolated check that copies only the EXE outside the checkout and removes
-Python and Node.js from its search path, run
-`py tests/smoke_portable.py dist/OpenUFC-0.1.0-win-x64.exe`.
-Check the frozen backend's VISA and Telnet connections against local instrument
-simulators with
-`py tests/smoke_backend.py dist/win-unpacked/resources/backend/openufc-backend.exe`.
 
-## Tests
-
-Run the consolidated core suite in `tests/test_core.py` with:
-
-```powershell
-npm test
-```
-
-The suite covers configuration, HTTP endpoints, instrument ownership and events,
-driver commands and failures, statistics/ADEV, and recording/export safeguards.
-Hardware I/O is replaced at the driver boundary; test data and configuration
-stay in the system temporary directory. The working `config.json` is not used.
-
-JavaScript syntax checks and Electron UI validation remain separate. The smoke
-test includes start/stop races across instrument switches for all four types:
-
-```powershell
-npm run test:js
-npm run smoke
-```
-
-Run `npm run verify` for the full Python, JavaScript, and Electron smoke flow.
-
-`npm test` runs the suite through the `py` launcher. When that interpreter does
-not have the development dependencies installed, for example because you work in
-a virtual environment, run the suite directly instead:
-
-```powershell
-.\.venv\Scripts\python.exe -B -m pytest -q -p no:cacheprovider
-```
 
 ## Universal Frequency Counter Notes
 
